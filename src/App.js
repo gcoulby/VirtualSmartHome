@@ -2,6 +2,7 @@ import "./App.css";
 import React, { Component } from "react";
 // import Paho from "paho-mqtt/paho-mqtt";
 import pahoMqtt from "paho-mqtt/paho-mqtt";
+import qr from "./qrcode_gcoulby.github.io.png";
 class App extends Component {
   state = {
     subject: "VirtualSmartHome/",
@@ -125,6 +126,15 @@ class App extends Component {
     return (
       <div className="wrapper">
         <h1>Virtual Smart Home: MQTT Pub/Sub Example</h1>
+        <div id="qr">
+          <h3>Control This Home from your Smartphone</h3>
+          <p>
+            <em>
+              Scan the QR code and follow the link. Then click connect on the app displayed in your mobile browser.
+            </em>
+          </p>
+          <img src={qr} style={{ width: "100%" }} alt="QR code for virtual smart home controller" />
+        </div>
 
         <svg width="800" height="600" viewBox="0 0 1298.64 1000">
           <defs>

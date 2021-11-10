@@ -68,3 +68,30 @@ input[type="button"]:hover {
   overflow-y: scroll;
   overflow: scroll;
 }
+
+.row > [class^="col-"] {
+  padding-top: 0.75 rem;
+  padding-bottom: 0.75 rem;
+  background-color: rgba(86, 61, 124, 0.15);
+  border: 1 px solid rgba(86, 61, 124, 0.2);
+}
+
+/* .col-8 {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 66.666667%;
+  flex: 0 0 66.666667%;
+  max-width: 66.666667%;
+}
+
+.col-4 {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 33.333333%;
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+} */
+
+#qr {
+  width: 300px;
+  position: absolute;
+  right: 2em;
+}
