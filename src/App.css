@@ -76,6 +76,34 @@ input[type="button"]:hover {
   border: 1 px solid rgba(86, 61, 124, 0.2);
 }
 
+.form-control {
+  width: 100%;
+  height: 2em;
+}
+
+.connected {
+  background: #28a74694 !important;
+  cursor: default !important;
+}
+
+.disconnected {
+  background: #dc3545 !important;
+  cursor: pointer !important;
+}
+
+#disconnect-button {
+  background: #007bff !important;
+}
+
+#disconnect-button.connected {
+  cursor: pointer !important;
+}
+
+#disconnect-button.disconnected {
+  cursor: default !important;
+  background: #111827 !important;
+}
+
 /* .col-8 {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 66.666667%;

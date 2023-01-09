@@ -2,7 +2,8 @@ import "./App.css";
 import React, { Component } from "react";
 // import Paho from "paho-mqtt/paho-mqtt";
 import pahoMqtt from "paho-mqtt/paho-mqtt";
-import qr from "./qrcode_gcoulby.github.io.png";
+import original from "./original-qr.png";
+import priviot from "./priviot-qr.png";
 class App extends Component {
   state = {
     subject: "VirtualSmartHome/",
@@ -26,6 +27,12 @@ class App extends Component {
     topic: "",
     client: {},
     messages: [],
+    qr: [
+      { name: "PrivIoT", src: priviot, displayDebug: false },
+      { name: "Original", src: original, displayDebug: true },
+    ],
+    selected_qr: 0,
+    connected: false,
   };
 
   // Called after form input is processed
@@ -54,6 +61,7 @@ class App extends Component {
       onSuccess: this.onConnect,
       useSSL: true,
     });
+
     this.setState({ client });
   };
 
@@ -65,15 +73,17 @@ class App extends Component {
 
       this.pushMessages([`Subscribing to: ${topic}`]);
     }
+    this.setState({ connected: true });
   };
 
   // Called when the client loses its connection
-  onConnectionLost(responseObject) {
+  onConnectionLost = (responseObject) => {
     console.log("onConnectionLost: Connection Lost");
     if (responseObject.errorCode !== 0) {
       console.log("onConnectionLost: " + responseObject.errorMessage);
     }
-  }
+    this.setState({ connected: false });
+  };
 
   changeLight = (destination, payload) => {
     let room_name = destination.substring(this.state.subject.length, destination.indexOf("/Light"));
@@ -118,22 +128,32 @@ class App extends Component {
 
   // Updates #messages div to auto-scroll
   updateScroll() {
-    var element = document.getElementById("messages");
-    element.scrollTop = element.scrollHeight;
+    if (this.state.qr[this.state.selected_qr].displayDebug === true) {
+      var element = document.getElementById("messages");
+      element.scrollTop = element.scrollHeight;
+    }
   }
 
   render() {
     return (
       <div className="wrapper">
-        <h1>Virtual Smart Home: MQTT Pub/Sub Example</h1>
+        <h1>Virtual Smart Home</h1>
         <div id="qr">
           <h3>Control This Home from your Smartphone</h3>
           <p>
-            <em>
-              Scan the QR code and follow the link. Then click connect on the app displayed in your mobile browser.
-            </em>
+            <em>Scan the QR code and follow the link. Then click connect on the app displayed in your mobile browser.</em>
           </p>
-          <img src={qr} style={{ width: "100%" }} alt="QR code for virtual smart home controller" />
+          <img src={this.state.qr[this.state.selected_qr].src} style={{ width: "100%" }} alt="QR code for virtual smart home controller" />
+          <select
+            className="form-control"
+            value={this.state.selected_qr}
+            onChange={(e) => {
+              this.setState({ selected_qr: e.target.value });
+            }}
+          >
+            <option value="0">PrivIoT</option>
+            <option value="1">Original</option>
+          </select>
         </div>
 
         <svg width="800" height="600" viewBox="0 0 1298.64 1000">
@@ -175,10 +195,7 @@ class App extends Component {
               />
             </clipPath>
             <clipPath id="clipPath-7">
-              <path
-                d="M40.68,789.6H1158.57s-84.84,48.64-579.94,48.64C192.11,838.24,40.68,789.6,40.68,789.6Z"
-                fill="#b55243"
-              />
+              <path d="M40.68,789.6H1158.57s-84.84,48.64-579.94,48.64C192.11,838.24,40.68,789.6,40.68,789.6Z" fill="#b55243" />
             </clipPath>
             <clipPath id="clipPath-8">
               <rect x="888.41" y="477.29" width="6.16" height="46.42" fill="#4b3757" />
@@ -261,14 +278,7 @@ class App extends Component {
                 fill="#ffea97"
               />
             </clipPath>
-            <linearGradient
-              id="Degradado_sin_nombre_3"
-              x1="385.52"
-              y1="461.18"
-              x2="385.52"
-              y2="370.24"
-              gradientUnits="userSpaceOnUse"
-            >
+            <linearGradient id="Degradado_sin_nombre_3" x1="385.52" y1="461.18" x2="385.52" y2="370.24" gradientUnits="userSpaceOnUse">
               <stop offset="0" stopColor="#fff" stopOpacity="0" />
               <stop offset="1" stopColor="#fff" />
             </linearGradient>
@@ -316,19 +326,13 @@ class App extends Component {
               <path d="M802.67,432.76H782.79a4,4,0,0,1-4-4h0a4,4,0,0,1,4-4h19.88Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-47">
-              <path
-                d="M802.67,426.48H783.73a2.28,2.28,0,0,0-2.28,2.27h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z"
-                fill="#ffe8cf"
-              />
+              <path d="M802.67,426.48H783.73a2.28,2.28,0,0,0-2.28,2.27h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-48">
               <path d="M802.67,424.75H782.79a4,4,0,0,1-4-4h0a4,4,0,0,1,4-4h19.88Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-49">
-              <path
-                d="M802.67,418.46H783.73a2.28,2.28,0,0,0-2.28,2.28h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z"
-                fill="#ffe8cf"
-              />
+              <path d="M802.67,418.46H783.73a2.28,2.28,0,0,0-2.28,2.28h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-50">
               <path d="M771.71,432.76h-8.42V405.39h8.42Z" fill="#4b3757" />
@@ -340,10 +344,7 @@ class App extends Component {
               <path d="M746.64,431.44l-8.2,1.92-6.25-26.64,8.19-1.92Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-53">
-              <path
-                d="M733.73,432.76H707.1a5.36,5.36,0,0,1-5.37-5.37h0A5.36,5.36,0,0,1,707.1,422h26.63Z"
-                fill="#4b3757"
-              />
+              <path d="M733.73,432.76H707.1a5.36,5.36,0,0,1-5.37-5.37h0A5.36,5.36,0,0,1,707.1,422h26.63Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-54">
               <path d="M733.73,424.34H708.36a3,3,0,0,0-3.05,3.05h0a3.05,3.05,0,0,0,3.05,3.06h25.37Z" fill="#ffe8cf" />
@@ -378,10 +379,7 @@ class App extends Component {
               <rect x="256.04" y="525.61" width="122.11" height="132" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-63">
-              <path
-                d="M363.31,620H320.36V565.76a21.47,21.47,0,0,1,21.47-21.47h0a21.48,21.48,0,0,1,21.48,21.47Z"
-                fill="#d3d2ff"
-              />
+              <path d="M363.31,620H320.36V565.76a21.47,21.47,0,0,1,21.47-21.47h0a21.48,21.48,0,0,1,21.48,21.47Z" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-64">
               <path
@@ -423,10 +421,7 @@ class App extends Component {
               />
             </clipPath>
             <clipPath id="clipPath-72">
-              <path
-                d="M283.76,634.89h16.58a1.82,1.82,0,0,0,1.81-1.82h0a1.81,1.81,0,0,0-1.81-1.81H283.76Z"
-                fill="#fff"
-              />
+              <path d="M283.76,634.89h16.58a1.82,1.82,0,0,0,1.81-1.82h0a1.81,1.81,0,0,0-1.81-1.81H283.76Z" fill="#fff" />
             </clipPath>
             <clipPath id="clipPath-73">
               <rect x="275.04" y="566.42" width="18.71" height="27.16" fill="#fff" />
@@ -439,283 +434,91 @@ class App extends Component {
               <rect x="378.15" y="525.61" width="216.8" height="132" fill="#ead16c" />
             </clipPath>
             <clipPath id="clipPath-76">
-              <rect
-                x="390.04"
-                y="652.16"
-                width="13.88"
-                height="3.88"
-                transform="translate(-257.11 1051.08) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="390.04" y="652.16" width="13.88" height="3.88" transform="translate(-257.11 1051.08) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-77">
-              <rect
-                x="382.04"
-                y="643.01"
-                width="33.76"
-                height="4.15"
-                transform="translate(797.84 1290.16) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="382.04" y="643.01" width="33.76" height="4.15" transform="translate(797.84 1290.16) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-78">
-              <rect
-                x="406.92"
-                y="638.27"
-                width="13.88"
-                height="3.88"
-                transform="translate(-226.35 1054.07) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="406.92" y="638.27" width="13.88" height="3.88" transform="translate(-226.35 1054.07) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-79">
-              <rect
-                x="406.99"
-                y="638.16"
-                width="13.88"
-                height="3.88"
-                transform="translate(-226.17 1054.03) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="406.99" y="638.16" width="13.88" height="3.88" transform="translate(-226.17 1054.03) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-80">
-              <rect
-                x="398.99"
-                y="629.02"
-                width="33.76"
-                height="4.15"
-                transform="translate(831.74 1262.18) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="398.99" y="629.02" width="33.76" height="4.15" transform="translate(831.74 1262.18) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-81">
-              <rect
-                x="423.87"
-                y="624.28"
-                width="13.88"
-                height="3.88"
-                transform="translate(-195.41 1057.03) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="423.87" y="624.28" width="13.88" height="3.88" transform="translate(-195.41 1057.03) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-82">
-              <rect
-                x="423.94"
-                y="624.17"
-                width="13.88"
-                height="3.88"
-                transform="translate(-195.23 1056.99) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="423.94" y="624.17" width="13.88" height="3.88" transform="translate(-195.23 1056.99) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-83">
-              <rect
-                x="415.94"
-                y="615.03"
-                width="33.76"
-                height="4.15"
-                transform="translate(865.63 1234.2) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="415.94" y="615.03" width="33.76" height="4.15" transform="translate(865.63 1234.2) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-84">
-              <rect
-                x="440.82"
-                y="610.29"
-                width="13.88"
-                height="3.88"
-                transform="translate(-164.47 1059.99) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="440.82" y="610.29" width="13.88" height="3.88" transform="translate(-164.47 1059.99) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-85">
-              <rect
-                x="440.89"
-                y="610.18"
-                width="13.88"
-                height="3.88"
-                transform="translate(-164.29 1059.95) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="440.89" y="610.18" width="13.88" height="3.88" transform="translate(-164.29 1059.95) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-86">
-              <rect
-                x="432.89"
-                y="601.03"
-                width="33.76"
-                height="4.15"
-                transform="translate(899.53 1206.21) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="432.89" y="601.03" width="33.76" height="4.15" transform="translate(899.53 1206.21) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-87">
-              <rect
-                x="457.76"
-                y="596.3"
-                width="13.88"
-                height="3.88"
-                transform="translate(-133.53 1062.94) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="457.76" y="596.3" width="13.88" height="3.88" transform="translate(-133.53 1062.94) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-88">
-              <rect
-                x="457.83"
-                y="596.19"
-                width="13.88"
-                height="3.88"
-                transform="translate(-133.35 1062.9) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="457.83" y="596.19" width="13.88" height="3.88" transform="translate(-133.35 1062.9) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-89">
-              <rect
-                x="449.84"
-                y="587.04"
-                width="33.76"
-                height="4.15"
-                transform="translate(933.43 1178.23) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="449.84" y="587.04" width="33.76" height="4.15" transform="translate(933.43 1178.23) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-90">
-              <rect
-                x="474.71"
-                y="582.31"
-                width="13.88"
-                height="3.88"
-                transform="translate(-102.59 1065.9) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="474.71" y="582.31" width="13.88" height="3.88" transform="translate(-102.59 1065.9) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-91">
-              <rect
-                x="474.78"
-                y="582.2"
-                width="13.88"
-                height="3.88"
-                transform="translate(-102.42 1065.86) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="474.78" y="582.2" width="13.88" height="3.88" transform="translate(-102.42 1065.86) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-92">
-              <rect
-                x="466.78"
-                y="573.05"
-                width="33.76"
-                height="4.15"
-                transform="translate(967.32 1150.25) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="466.78" y="573.05" width="33.76" height="4.15" transform="translate(967.32 1150.25) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-93">
-              <rect
-                x="491.66"
-                y="568.32"
-                width="13.88"
-                height="3.88"
-                transform="translate(-71.66 1068.86) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="491.66" y="568.32" width="13.88" height="3.88" transform="translate(-71.66 1068.86) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-94">
-              <rect
-                x="491.73"
-                y="568.21"
-                width="13.88"
-                height="3.88"
-                transform="translate(-71.48 1068.82) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="491.73" y="568.21" width="13.88" height="3.88" transform="translate(-71.48 1068.82) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-95">
-              <rect
-                x="483.73"
-                y="559.06"
-                width="33.76"
-                height="4.15"
-                transform="translate(1001.22 1122.27) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="483.73" y="559.06" width="33.76" height="4.15" transform="translate(1001.22 1122.27) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-96">
-              <rect
-                x="508.61"
-                y="554.33"
-                width="13.88"
-                height="3.88"
-                transform="translate(-40.72 1071.81) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="508.61" y="554.33" width="13.88" height="3.88" transform="translate(-40.72 1071.81) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-97">
-              <rect
-                x="508.68"
-                y="554.22"
-                width="13.88"
-                height="3.88"
-                transform="translate(-40.54 1071.77) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="508.68" y="554.22" width="13.88" height="3.88" transform="translate(-40.54 1071.77) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-98">
-              <rect
-                x="500.68"
-                y="545.07"
-                width="33.76"
-                height="4.15"
-                transform="translate(1035.11 1094.28) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="500.68" y="545.07" width="33.76" height="4.15" transform="translate(1035.11 1094.28) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-99">
-              <rect
-                x="525.56"
-                y="540.34"
-                width="13.88"
-                height="3.88"
-                transform="translate(-9.78 1074.77) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="525.56" y="540.34" width="13.88" height="3.88" transform="translate(-9.78 1074.77) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-100">
-              <rect
-                x="525.63"
-                y="540.23"
-                width="13.88"
-                height="3.88"
-                transform="translate(-9.6 1074.73) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="525.63" y="540.23" width="13.88" height="3.88" transform="translate(-9.6 1074.73) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-101">
-              <rect
-                x="517.63"
-                y="531.08"
-                width="33.76"
-                height="4.15"
-                transform="translate(1069.01 1066.3) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="517.63" y="531.08" width="33.76" height="4.15" transform="translate(1069.01 1066.3) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-102">
-              <rect
-                x="542.5"
-                y="526.34"
-                width="13.88"
-                height="3.88"
-                transform="translate(21.16 1077.73) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="542.5" y="526.34" width="13.88" height="3.88" transform="translate(21.16 1077.73) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-103">
               <circle cx="557.34" cy="583.43" r="29.24" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-104">
-              <path
-                d="M520.16,629.57h-35c-6,27.2,17.53,25.26,17.53,25.26S526.14,656.77,520.16,629.57Z"
-                fill="#d3d2ff"
-              />
+              <path d="M520.16,629.57h-35c-6,27.2,17.53,25.26,17.53,25.26S526.14,656.77,520.16,629.57Z" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-105">
               <path
@@ -738,27 +541,13 @@ class App extends Component {
               <rect x="329.98" y="669.39" width="17.17" height="25.47" rx="2.69" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-109">
-              <rect
-                x="349.1"
-                y="673.82"
-                width="17.75"
-                height="23.08"
-                rx="2.69"
-                transform="translate(-327.38 1043.34) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="349.1" y="673.82" width="17.75" height="23.08" rx="2.69" transform="translate(-327.38 1043.34) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-110">
-              <path
-                d="M312.31,680.27v-9.81H287.57v9.81h-3.42V694.4L315.06,696V680.27Zm-22.74-7.81h20.74v7.81H289.57Z"
-                fill="#ffea97"
-              />
+              <path d="M312.31,680.27v-9.81H287.57v9.81h-3.42V694.4L315.06,696V680.27Zm-22.74-7.81h20.74v7.81H289.57Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-111">
-              <path
-                d="M389.89,683.63v-7.71H370.43v7.71h-2.69v11.12L392.06,696V683.63ZM372,677.49h16.32v6.14H372Z"
-                fill="#7370bd"
-              />
+              <path d="M389.89,683.63v-7.71H370.43v7.71h-2.69v11.12L392.06,696V683.63ZM372,677.49h16.32v6.14H372Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-112">
               <rect x="279.94" y="693.29" width="114.11" height="3.79" fill="#4b3757" />
@@ -804,274 +593,85 @@ class App extends Component {
               <rect x="256.04" y="789.92" width="338.53" height="126" fill="#895da8" />
             </clipPath>
             <clipPath id="clipPath-123">
-              <rect
-                x="282.85"
-                y="917.04"
-                width="13.88"
-                height="3.89"
-                transform="translate(-629.19 1208.77) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="282.85" y="917.04" width="13.88" height="3.89" transform="translate(-629.19 1208.77) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-124">
-              <rect
-                x="274.81"
-                y="907.89"
-                width="33.85"
-                height="4.15"
-                transform="translate(583.47 1819.93) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="274.81" y="907.89" width="33.85" height="4.15" transform="translate(583.47 1819.93) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-125">
-              <rect
-                x="299.78"
-                y="903.15"
-                width="13.88"
-                height="3.89"
-                transform="translate(-598.38 1211.81) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="299.78" y="903.15" width="13.88" height="3.89" transform="translate(-598.38 1211.81) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-126">
-              <rect
-                x="299.85"
-                y="903.04"
-                width="13.88"
-                height="3.89"
-                transform="translate(-598.2 1211.77) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="299.85" y="903.04" width="13.88" height="3.89" transform="translate(-598.2 1211.77) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-127">
-              <rect
-                x="291.8"
-                y="893.9"
-                width="33.85"
-                height="4.15"
-                transform="translate(617.46 1791.95) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="291.8" y="893.9" width="33.85" height="4.15" transform="translate(617.46 1791.95) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-128">
-              <rect
-                x="316.77"
-                y="889.16"
-                width="13.88"
-                height="3.89"
-                transform="translate(-567.39 1214.82) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="316.77" y="889.16" width="13.88" height="3.89" transform="translate(-567.39 1214.82) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-129">
-              <rect
-                x="316.84"
-                y="889.05"
-                width="13.88"
-                height="3.89"
-                transform="translate(-567.22 1214.78) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="316.84" y="889.05" width="13.88" height="3.89" transform="translate(-567.22 1214.78) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-130">
-              <rect
-                x="308.8"
-                y="879.91"
-                width="33.85"
-                height="4.15"
-                transform="translate(651.45 1763.97) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="308.8" y="879.91" width="33.85" height="4.15" transform="translate(651.45 1763.97) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-131">
-              <rect
-                x="333.77"
-                y="875.17"
-                width="13.88"
-                height="3.89"
-                transform="translate(-536.41 1217.82) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="333.77" y="875.17" width="13.88" height="3.89" transform="translate(-536.41 1217.82) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-132">
-              <rect
-                x="333.84"
-                y="875.06"
-                width="13.88"
-                height="3.89"
-                transform="translate(-536.23 1217.78) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="333.84" y="875.06" width="13.88" height="3.89" transform="translate(-536.23 1217.78) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-133">
-              <rect
-                x="325.8"
-                y="865.92"
-                width="33.85"
-                height="4.15"
-                transform="translate(685.44 1735.98) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="325.8" y="865.92" width="33.85" height="4.15" transform="translate(685.44 1735.98) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-134">
-              <rect
-                x="350.76"
-                y="861.18"
-                width="13.88"
-                height="3.89"
-                transform="translate(-505.42 1220.83) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="350.76" y="861.18" width="13.88" height="3.89" transform="translate(-505.42 1220.83) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-135">
-              <rect
-                x="350.83"
-                y="861.07"
-                width="13.88"
-                height="3.89"
-                transform="translate(-505.24 1220.79) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="350.83" y="861.07" width="13.88" height="3.89" transform="translate(-505.24 1220.79) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-136">
-              <rect
-                x="342.79"
-                y="851.93"
-                width="33.85"
-                height="4.15"
-                transform="translate(719.43 1708) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="342.79" y="851.93" width="33.85" height="4.15" transform="translate(719.43 1708) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-137">
-              <rect
-                x="367.76"
-                y="847.19"
-                width="13.88"
-                height="3.89"
-                transform="translate(-474.43 1223.83) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="367.76" y="847.19" width="13.88" height="3.89" transform="translate(-474.43 1223.83) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-138">
-              <rect
-                x="367.83"
-                y="847.08"
-                width="13.88"
-                height="3.89"
-                transform="translate(-474.25 1223.79) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="367.83" y="847.08" width="13.88" height="3.89" transform="translate(-474.25 1223.79) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-139">
-              <rect
-                x="359.79"
-                y="837.94"
-                width="33.85"
-                height="4.15"
-                transform="translate(753.43 1680.02) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="359.79" y="837.94" width="33.85" height="4.15" transform="translate(753.43 1680.02) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-140">
-              <rect
-                x="384.75"
-                y="833.2"
-                width="13.88"
-                height="3.89"
-                transform="translate(-443.45 1226.84) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="384.75" y="833.2" width="13.88" height="3.89" transform="translate(-443.45 1226.84) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-141">
-              <rect
-                x="384.82"
-                y="833.09"
-                width="13.88"
-                height="3.89"
-                transform="translate(-443.27 1226.8) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="384.82" y="833.09" width="13.88" height="3.89" transform="translate(-443.27 1226.8) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-142">
-              <rect
-                x="376.78"
-                y="823.94"
-                width="33.85"
-                height="4.15"
-                transform="translate(787.42 1652.04) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="376.78" y="823.94" width="33.85" height="4.15" transform="translate(787.42 1652.04) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-143">
-              <rect
-                x="401.75"
-                y="819.21"
-                width="13.88"
-                height="3.89"
-                transform="translate(-412.46 1229.84) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="401.75" y="819.21" width="13.88" height="3.89" transform="translate(-412.46 1229.84) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-144">
-              <rect
-                x="401.82"
-                y="819.1"
-                width="13.88"
-                height="3.89"
-                transform="translate(-412.28 1229.8) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="401.82" y="819.1" width="13.88" height="3.89" transform="translate(-412.28 1229.8) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-145">
-              <rect
-                x="393.78"
-                y="809.95"
-                width="33.85"
-                height="4.15"
-                transform="translate(821.41 1624.05) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="393.78" y="809.95" width="33.85" height="4.15" transform="translate(821.41 1624.05) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-146">
-              <rect
-                x="418.75"
-                y="805.21"
-                width="13.88"
-                height="3.89"
-                transform="translate(-381.47 1232.85) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="418.75" y="805.21" width="13.88" height="3.89" transform="translate(-381.47 1232.85) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-147">
-              <rect
-                x="418.82"
-                y="805.11"
-                width="13.88"
-                height="3.89"
-                transform="translate(-381.29 1232.81) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="418.82" y="805.11" width="13.88" height="3.89" transform="translate(-381.29 1232.81) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-148">
-              <rect
-                x="410.77"
-                y="795.96"
-                width="33.85"
-                height="4.15"
-                transform="translate(855.4 1596.07) rotate(180)"
-                fill="#ffe8cf"
-              />
+              <rect x="410.77" y="795.96" width="33.85" height="4.15" transform="translate(855.4 1596.07) rotate(180)" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-149">
-              <rect
-                x="435.74"
-                y="791.22"
-                width="13.88"
-                height="3.89"
-                transform="translate(-350.49 1235.85) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="435.74" y="791.22" width="13.88" height="3.89" transform="translate(-350.49 1235.85) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-150">
               <rect x="291.41" y="787.71" width="4.84" height="33.47" fill="#4b3757" />
@@ -1120,41 +720,16 @@ class App extends Component {
               />
             </clipPath>
             <clipPath id="clipPath-161">
-              <rect
-                x="417.56"
-                y="857.82"
-                width="9.16"
-                height="10.36"
-                rx="0.88"
-                fill="#7370bd"
-                opacity="0.2"
-                style={{ mixBlendMode: "multiply" }}
-              />
+              <rect x="417.56" y="857.82" width="9.16" height="10.36" rx="0.88" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
             </clipPath>
             <clipPath id="clipPath-162">
               <rect x="407.33" y="857.82" width="9.16" height="10.36" rx="0.88" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-163">
-              <rect
-                x="429.44"
-                y="857.28"
-                width="9.47"
-                height="12.32"
-                rx="0.88"
-                transform="translate(-429.26 1297.62) rotate(-90)"
-                fill="#ff8d7b"
-              />
+              <rect x="429.44" y="857.28" width="9.47" height="12.32" rx="0.88" transform="translate(-429.26 1297.62) rotate(-90)" fill="#ff8d7b" />
             </clipPath>
             <clipPath id="clipPath-164">
-              <rect
-                x="399.04"
-                y="892.08"
-                width="9.47"
-                height="12.32"
-                rx="0.88"
-                transform="translate(-494.46 1302.02) rotate(-90)"
-                fill="#fff"
-              />
+              <rect x="399.04" y="892.08" width="9.47" height="12.32" rx="0.88" transform="translate(-494.46 1302.02) rotate(-90)" fill="#fff" />
             </clipPath>
             <clipPath id="clipPath-165">
               <rect x="383.1" y="902.82" width="59.88" height="1.54" fill="#4b3757" />
@@ -1169,24 +744,10 @@ class App extends Component {
               <rect x="383.1" y="852.27" width="59.88" height="1.54" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-169">
-              <rect
-                x="353.21"
-                y="881.52"
-                width="60.05"
-                height="1.54"
-                transform="translate(1265.53 499.06) rotate(90)"
-                fill="#4b3757"
-              />
+              <rect x="353.21" y="881.52" width="60.05" height="1.54" transform="translate(1265.53 499.06) rotate(90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-170">
-              <rect
-                x="412.19"
-                y="881.52"
-                width="60.05"
-                height="1.54"
-                transform="translate(1324.52 440.08) rotate(90)"
-                fill="#4b3757"
-              />
+              <rect x="412.19" y="881.52" width="60.05" height="1.54" transform="translate(1324.52 440.08) rotate(90)" fill="#4b3757" />
             </clipPath>
             <linearGradient id="Degradado_sin_nombre_3-8" x1="329.31" y1="870.04" x2="329.31" y2="779.1" />
             <linearGradient id="Degradado_sin_nombre_3-9" x1="421.1" y1="870.04" x2="421.1" y2="779.1" />
@@ -1201,211 +762,85 @@ class App extends Component {
               <rect x="466.51" y="750.76" width="2.02" height="13.81" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-174">
-              <rect
-                x="568.01"
-                y="787.57"
-                width="13.88"
-                height="3.88"
-                transform="translate(-214.55 1364.46) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="568.01" y="787.57" width="13.88" height="3.88" transform="translate(-214.55 1364.46) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-175">
               <rect x="556.14" y="778.42" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-176">
-              <rect
-                x="551.14"
-                y="773.69"
-                width="13.88"
-                height="3.88"
-                transform="translate(-217.55 1333.7) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="551.14" y="773.69" width="13.88" height="3.88" transform="translate(-217.55 1333.7) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-177">
-              <rect
-                x="551.07"
-                y="773.58"
-                width="13.88"
-                height="3.88"
-                transform="translate(-217.51 1333.52) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="551.07" y="773.58" width="13.88" height="3.88" transform="translate(-217.51 1333.52) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-178">
               <rect x="539.19" y="764.43" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-179">
-              <rect
-                x="534.19"
-                y="759.69"
-                width="13.88"
-                height="3.88"
-                transform="translate(-220.5 1302.76) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="534.19" y="759.69" width="13.88" height="3.88" transform="translate(-220.5 1302.76) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-180">
-              <rect
-                x="534.12"
-                y="759.58"
-                width="13.88"
-                height="3.88"
-                transform="translate(-220.46 1302.58) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="534.12" y="759.58" width="13.88" height="3.88" transform="translate(-220.46 1302.58) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-181">
               <rect x="522.24" y="750.44" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-182">
-              <rect
-                x="517.24"
-                y="745.7"
-                width="13.88"
-                height="3.88"
-                transform="translate(-223.46 1271.82) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="517.24" y="745.7" width="13.88" height="3.88" transform="translate(-223.46 1271.82) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-183">
-              <rect
-                x="517.17"
-                y="745.59"
-                width="13.88"
-                height="3.88"
-                transform="translate(-223.42 1271.64) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="517.17" y="745.59" width="13.88" height="3.88" transform="translate(-223.42 1271.64) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-184">
               <rect x="505.29" y="736.45" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-185">
-              <rect
-                x="500.29"
-                y="731.71"
-                width="13.88"
-                height="3.88"
-                transform="translate(-226.42 1240.88) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="500.29" y="731.71" width="13.88" height="3.88" transform="translate(-226.42 1240.88) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-186">
-              <rect
-                x="500.22"
-                y="731.6"
-                width="13.88"
-                height="3.88"
-                transform="translate(-226.38 1240.7) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="500.22" y="731.6" width="13.88" height="3.88" transform="translate(-226.38 1240.7) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-187">
               <rect x="488.35" y="722.45" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-188">
-              <rect
-                x="483.34"
-                y="717.72"
-                width="13.88"
-                height="3.88"
-                transform="translate(-229.37 1209.94) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="483.34" y="717.72" width="13.88" height="3.88" transform="translate(-229.37 1209.94) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-189">
-              <rect
-                x="483.27"
-                y="717.61"
-                width="13.88"
-                height="3.88"
-                transform="translate(-229.33 1209.77) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="483.27" y="717.61" width="13.88" height="3.88" transform="translate(-229.33 1209.77) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-190">
               <rect x="471.4" y="708.46" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-191">
-              <rect
-                x="466.4"
-                y="703.73"
-                width="13.88"
-                height="3.88"
-                transform="translate(-232.33 1179.01) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="466.4" y="703.73" width="13.88" height="3.88" transform="translate(-232.33 1179.01) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-192">
-              <rect
-                x="466.33"
-                y="703.62"
-                width="13.88"
-                height="3.88"
-                transform="translate(-232.29 1178.83) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="466.33" y="703.62" width="13.88" height="3.88" transform="translate(-232.29 1178.83) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-193">
               <rect x="454.45" y="694.47" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-194">
-              <rect
-                x="449.45"
-                y="689.74"
-                width="13.88"
-                height="3.88"
-                transform="translate(-235.29 1148.07) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="449.45" y="689.74" width="13.88" height="3.88" transform="translate(-235.29 1148.07) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-195">
-              <rect
-                x="449.38"
-                y="689.63"
-                width="13.88"
-                height="3.88"
-                transform="translate(-235.25 1147.89) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="449.38" y="689.63" width="13.88" height="3.88" transform="translate(-235.25 1147.89) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-196">
               <rect x="437.5" y="680.48" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-197">
-              <rect
-                x="432.5"
-                y="675.75"
-                width="13.88"
-                height="3.88"
-                transform="translate(-238.24 1117.13) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="432.5" y="675.75" width="13.88" height="3.88" transform="translate(-238.24 1117.13) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-198">
-              <rect
-                x="432.43"
-                y="675.64"
-                width="13.88"
-                height="3.88"
-                transform="translate(-238.2 1116.95) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="432.43" y="675.64" width="13.88" height="3.88" transform="translate(-238.2 1116.95) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-199">
               <rect x="420.56" y="666.49" width="33.76" height="4.15" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-200">
-              <rect
-                x="415.55"
-                y="661.76"
-                width="13.88"
-                height="3.88"
-                transform="translate(-241.2 1086.19) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="415.55" y="661.76" width="13.88" height="3.88" transform="translate(-241.2 1086.19) rotate(-90)" fill="#4b3757" />
             </clipPath>
             <linearGradient id="Degradado_sin_nombre_3-11" x1="557.09" y1="740.26" x2="557.09" y2="649.32" />
             <linearGradient id="Degradado_sin_nombre_3-12" x1="470.94" y1="740.26" x2="470.94" y2="649.32" />
@@ -1487,25 +922,16 @@ class App extends Component {
               <path d="M854.3,791.76l10.9-33.49h12l-21.38,34.1C855.32,793.17,854,792.64,854.3,791.76Z" fill="#ff654d" />
             </clipPath>
             <clipPath id="clipPath-223">
-              <path
-                d="M985.68,791.76l-10.9-33.49h-12l21.38,34.1C984.66,793.17,986,792.64,985.68,791.76Z"
-                fill="#ff654d"
-              />
+              <path d="M985.68,791.76l-10.9-33.49h-12l21.38,34.1C984.66,793.17,986,792.64,985.68,791.76Z" fill="#ff654d" />
             </clipPath>
             <clipPath id="clipPath-224">
-              <path
-                d="M993.67,755.84c0-3.56-33-4-73.71-4s-73.68.46-73.68,4c0,6.45,33,8.88,73.68,8.88S993.67,762.29,993.67,755.84Z"
-                fill="#4b3757"
-              />
+              <path d="M993.67,755.84c0-3.56-33-4-73.71-4s-73.68.46-73.68,4c0,6.45,33,8.88,73.68,8.88S993.67,762.29,993.67,755.84Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-225">
               <ellipse cx="919.99" cy="755.84" rx="73.68" ry="6.45" fill="#ff654d" />
             </clipPath>
             <clipPath id="clipPath-226">
-              <path
-                d="M1042,767.63h-33.08c-5.65,25.68,16.54,23.85,16.54,23.85S1047.63,793.31,1042,767.63Z"
-                fill="#ff8d7b"
-              />
+              <path d="M1042,767.63h-33.08c-5.65,25.68,16.54,23.85,16.54,23.85S1047.63,793.31,1042,767.63Z" fill="#ff8d7b" />
             </clipPath>
             <clipPath id="clipPath-227">
               <ellipse cx="1025.45" cy="767.63" rx="16.54" ry="3.38" fill="#4b3757" />
@@ -1549,28 +975,16 @@ class App extends Component {
               <path d="M744.8,614.78h-5.55v-18h5.55Z" fill="#b55243" />
             </clipPath>
             <clipPath id="clipPath-238">
-              <path
-                d="M792.82,614.78H779.7a2.65,2.65,0,0,1-2.64-2.65h0a2.64,2.64,0,0,1,2.64-2.64h13.12Z"
-                fill="#4b3757"
-              />
+              <path d="M792.82,614.78H779.7a2.65,2.65,0,0,1-2.64-2.65h0a2.64,2.64,0,0,1,2.64-2.64h13.12Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-239">
-              <path
-                d="M792.82,610.63H780.33a1.51,1.51,0,0,0-1.51,1.5h0a1.52,1.52,0,0,0,1.51,1.51h12.49Z"
-                fill="#ffe8cf"
-              />
+              <path d="M792.82,610.63H780.33a1.51,1.51,0,0,0-1.51,1.5h0a1.52,1.52,0,0,0,1.51,1.51h12.49Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-240">
-              <path
-                d="M792.82,609.49H779.7a2.64,2.64,0,0,1-2.64-2.64h0a2.65,2.65,0,0,1,2.64-2.65h13.12Z"
-                fill="#ffea97"
-              />
+              <path d="M792.82,609.49H779.7a2.64,2.64,0,0,1-2.64-2.64h0a2.65,2.65,0,0,1,2.64-2.65h13.12Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-241">
-              <path
-                d="M792.82,605.34H780.33a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                fill="#ffe8cf"
-              />
+              <path d="M792.82,605.34H780.33a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-242">
               <path d="M798.29,614.78h-5.55v-18h5.55Z" fill="#4b3757" />
@@ -1585,43 +999,28 @@ class App extends Component {
               <path d="M803.78,614.78h-5.56V598.55h5.56Z" fill="#b55243" />
             </clipPath>
             <clipPath id="clipPath-246">
-              <path
-                d="M765.9,614.78H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z"
-                fill="#4b3757"
-              />
+              <path d="M765.9,614.78H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-247">
               <path d="M765.9,609.22H749.18a2,2,0,0,0-2,2h0a2,2,0,0,0,2,2H765.9Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-248">
-              <path
-                d="M765.9,607.7H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z"
-                fill="#d3d2ff"
-              />
+              <path d="M765.9,607.7H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-249">
               <path d="M765.9,602.14H749.18a2,2,0,0,0-2,2h0a2,2,0,0,0,2,2H765.9Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-250">
-              <path
-                d="M766,615.61V599.94a3.17,3.17,0,0,1,3.16-3.16h0a3.16,3.16,0,0,1,3.16,3.16v15.67Z"
-                fill="#ffea97"
-              />
+              <path d="M766,615.61V599.94a3.17,3.17,0,0,1,3.16-3.16h0a3.16,3.16,0,0,1,3.16,3.16v15.67Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-251">
               <path d="M770.94,615.61V600.69a1.8,1.8,0,0,0-1.8-1.8h0a1.79,1.79,0,0,0-1.79,1.8v14.92Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-252">
-              <path
-                d="M772.3,615.61V603.32a2.48,2.48,0,0,1,2.48-2.48h0a2.48,2.48,0,0,1,2.47,2.48v12.29Z"
-                fill="#7370bd"
-              />
+              <path d="M772.3,615.61V603.32a2.48,2.48,0,0,1,2.48-2.48h0a2.48,2.48,0,0,1,2.47,2.48v12.29Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-253">
-              <path
-                d="M776.19,615.61V603.9a1.41,1.41,0,0,0-1.41-1.4h0a1.41,1.41,0,0,0-1.41,1.4v11.71Z"
-                fill="#ffe8cf"
-              />
+              <path d="M776.19,615.61V603.9a1.41,1.41,0,0,0-1.41-1.4h0a1.41,1.41,0,0,0-1.41,1.4v11.71Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-254">
               <rect x="736.82" y="614.78" width="80.79" height="2.08" fill="#4b3757" />
@@ -1636,10 +1035,7 @@ class App extends Component {
               />
             </clipPath>
             <clipPath id="clipPath-257">
-              <path
-                d="M803.24,586.47H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z"
-                fill="#ffe8cf"
-              />
+              <path d="M803.24,586.47H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-258">
               <path
@@ -1648,10 +1044,7 @@ class App extends Component {
               />
             </clipPath>
             <clipPath id="clipPath-259">
-              <path
-                d="M803.24,580.17H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z"
-                fill="#ffe8cf"
-              />
+              <path d="M803.24,580.17H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-260">
               <path d="M761.34,591.41h-5.55v-18h5.55Z" fill="#4b3757" />
@@ -1675,25 +1068,16 @@ class App extends Component {
               <path d="M766.83,591.41h-5.55V575.18h5.55Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-267">
-              <path
-                d="M744.51,592.24V576.57a3.15,3.15,0,0,1,3.16-3.15h0a3.16,3.16,0,0,1,3.16,3.15v15.67Z"
-                fill="#ffea97"
-              />
+              <path d="M744.51,592.24V576.57a3.15,3.15,0,0,1,3.16-3.15h0a3.16,3.16,0,0,1,3.16,3.15v15.67Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-268">
               <path d="M749.46,592.24V577.32a1.8,1.8,0,0,0-1.79-1.8h0a1.81,1.81,0,0,0-1.8,1.8v14.92Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-269">
-              <path
-                d="M750.83,592.24V580a2.47,2.47,0,0,1,2.47-2.47h0a2.48,2.48,0,0,1,2.48,2.47v12.29Z"
-                fill="#7370bd"
-              />
+              <path d="M750.83,592.24V580a2.47,2.47,0,0,1,2.47-2.47h0a2.48,2.48,0,0,1,2.48,2.47v12.29Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-270">
-              <path
-                d="M754.71,592.24v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z"
-                fill="#ffe8cf"
-              />
+              <path d="M754.71,592.24v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-271">
               <rect x="736.82" y="591.41" width="80.79" height="2.08" fill="#4b3757" />
@@ -1717,28 +1101,16 @@ class App extends Component {
               <path d="M814.59,568H809V550h5.55Z" fill="#d3d2ff" />
             </clipPath>
             <clipPath id="clipPath-278">
-              <path
-                d="M803.24,568H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.65h13.11Z"
-                fill="#4b3757"
-              />
+              <path d="M803.24,568H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.65h13.11Z" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-279">
-              <path
-                d="M803.24,563.89H790.75a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                fill="#ffe8cf"
-              />
+              <path d="M803.24,563.89H790.75a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-280">
-              <path
-                d="M803.24,562.75H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.64h13.11Z"
-                fill="#ffea97"
-              />
+              <path d="M803.24,562.75H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.64h13.11Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-281">
-              <path
-                d="M803.24,558.61H790.75a1.51,1.51,0,0,0-1.51,1.5h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                fill="#ffe8cf"
-              />
+              <path d="M803.24,558.61H790.75a1.51,1.51,0,0,0-1.51,1.5h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-282">
               <path d="M782.82,568h-5.55V550h5.55Z" fill="#4b3757" />
@@ -1750,25 +1122,16 @@ class App extends Component {
               <path d="M809.89,567.49l-5.49.87-2.83-17.82,5.49-.87Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-285">
-              <path
-                d="M766,568.87V553.21a3.16,3.16,0,0,1,3.16-3.16h0a3.15,3.15,0,0,1,3.16,3.16v15.66Z"
-                fill="#ffea97"
-              />
+              <path d="M766,568.87V553.21a3.16,3.16,0,0,1,3.16-3.16h0a3.15,3.15,0,0,1,3.16,3.16v15.66Z" fill="#ffea97" />
             </clipPath>
             <clipPath id="clipPath-286">
               <path d="M770.94,568.87V554a1.81,1.81,0,0,0-1.8-1.8h0a1.8,1.8,0,0,0-1.79,1.8v14.92Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-287">
-              <path
-                d="M772.3,568.87V556.58a2.48,2.48,0,0,1,2.48-2.47h0a2.48,2.48,0,0,1,2.47,2.47v12.29Z"
-                fill="#7370bd"
-              />
+              <path d="M772.3,568.87V556.58a2.48,2.48,0,0,1,2.48-2.47h0a2.48,2.48,0,0,1,2.47,2.47v12.29Z" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-288">
-              <path
-                d="M776.19,568.87v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z"
-                fill="#ffe8cf"
-              />
+              <path d="M776.19,568.87v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z" fill="#ffe8cf" />
             </clipPath>
             <clipPath id="clipPath-289">
               <rect x="736.82" y="568.04" width="80.79" height="2.08" fill="#4b3757" />
@@ -1777,24 +1140,10 @@ class App extends Component {
               <rect x="736.82" y="546.59" width="80.79" height="2.08" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-291">
-              <rect
-                x="696.5"
-                y="586.05"
-                width="81.02"
-                height="2.08"
-                transform="translate(1324.1 -149.91) rotate(90)"
-                fill="#4b3757"
-              />
+              <rect x="696.5" y="586.05" width="81.02" height="2.08" transform="translate(1324.1 -149.91) rotate(90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-292">
-              <rect
-                x="776.08"
-                y="586.05"
-                width="81.02"
-                height="2.08"
-                transform="translate(1403.68 -229.49) rotate(90)"
-                fill="#4b3757"
-              />
+              <rect x="776.08" y="586.05" width="81.02" height="2.08" transform="translate(1403.68 -229.49) rotate(90)" fill="#4b3757" />
             </clipPath>
             <clipPath id="clipPath-293">
               <rect x="734.26" y="624.91" width="84.79" height="2.8" fill="#4b3757" />
@@ -1810,10 +1159,7 @@ class App extends Component {
             </clipPath>
             <linearGradient id="Degradado_sin_nombre_3-17" x1="669.1" y1="620.88" x2="669.1" y2="516.52" />
             <clipPath id="clipPath-297">
-              <polygon
-                points="1057.81 543.29 828.73 543.29 828.73 652.55 1077.7 652.55 1057.81 543.29"
-                fill="#7370bd"
-              />
+              <polygon points="1057.81 543.29 828.73 543.29 828.73 652.55 1077.7 652.55 1057.81 543.29" fill="#7370bd" />
             </clipPath>
             <clipPath id="clipPath-298">
               <polygon points="819.15 189.74 260.56 189.74 214.86 370.24 864.86 370.24 819.15 189.74" fill="#7370bd" />
@@ -1847,31 +1193,9 @@ class App extends Component {
                 fill="#fff"
                 opacity="0.1"
               />
-              <ellipse
-                cx="979.2"
-                cy="172.29"
-                rx="125.06"
-                ry="110.18"
-                transform="translate(423.55 996.77) rotate(-66)"
-                fill="#fff"
-                opacity="0.2"
-              />
-              <ellipse
-                cx="979.2"
-                cy="172.29"
-                rx="134.86"
-                ry="90.37"
-                transform="translate(-7.1 297.7) rotate(-17.23)"
-                fill="#fff"
-                opacity="0.2"
-              />
-              <circle
-                cx="979.2"
-                cy="172.29"
-                r="78.26"
-                transform="translate(-13.39 229.58) rotate(-13.28)"
-                fill="#fff"
-              />
+              <ellipse cx="979.2" cy="172.29" rx="125.06" ry="110.18" transform="translate(423.55 996.77) rotate(-66)" fill="#fff" opacity="0.2" />
+              <ellipse cx="979.2" cy="172.29" rx="134.86" ry="90.37" transform="translate(-7.1 297.7) rotate(-17.23)" fill="#fff" opacity="0.2" />
+              <circle cx="979.2" cy="172.29" r="78.26" transform="translate(-13.39 229.58) rotate(-13.28)" fill="#fff" />
               <path
                 d="M985.28,293c-30.77,63.44-44.13,249.81-49.14,347.4-1.71,33.28,25.49,61.17,59.64,61.17h0c34.16,0,61.36-27.89,59.65-61.17-5-97.59-18.37-284-49.14-347.4A11.71,11.71,0,0,0,985.28,293Z"
                 fill="#b55243"
@@ -2238,12 +1562,7 @@ class App extends Component {
                   opacity="0.2"
                   style={{ mixBlendMode: "multiply" }}
                 />
-                <path
-                  d="M160.89,303S89.3,619.21,217.72,597L207.35,358Z"
-                  fill="#fff"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "overlay" }}
-                />
+                <path d="M160.89,303S89.3,619.21,217.72,597L207.35,358Z" fill="#fff" opacity="0.2" style={{ mixBlendMode: "overlay" }} />
               </g>
               <line
                 x1="154.02"
@@ -2644,10 +1963,7 @@ class App extends Component {
                   style={{ mixBlendMode: "multiply" }}
                 />
               </g>
-              <path
-                d="M40.68,789.6H1158.57s-84.84,48.64-579.94,48.64C192.11,838.24,40.68,789.6,40.68,789.6Z"
-                fill="#b55243"
-              />
+              <path d="M40.68,789.6H1158.57s-84.84,48.64-579.94,48.64C192.11,838.24,40.68,789.6,40.68,789.6Z" fill="#b55243" />
               <g clipPath="url(#clipPath-7)">
                 <path
                   d="M546.57,759.29S394,784.76,412.79,802.67c35.14,33.58,430.62,32.41,745.78-13.07h0v70.74L383.2,875.5l-355.79-43-1.26-67.69Z"
@@ -2703,12 +2019,7 @@ class App extends Component {
               </g>
               <rect x="833.15" y="477.29" width="6.16" height="46.42" fill="#4b3757" />
               <g clipPath="url(#clipPath-13)">
-                <path
-                  d="M842,484.55s-5.81-2.73-5.81,7.37v31.79h-5V476.14h11.84Z"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
+                <path d="M842,484.55s-5.81-2.73-5.81,7.37v31.79h-5V476.14h11.84Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
               </g>
               <rect x="883.52" y="525.61" width="6" height="40.11" fill="#4b3757" />
               <path
@@ -2717,28 +2028,14 @@ class App extends Component {
                 opacity="0.2"
                 style={{ mixBlendMode: "multiply" }}
               />
-              <rect
-                x="857.26"
-                y="486.97"
-                width="10.11"
-                height="77.27"
-                transform="translate(336.7 1387.92) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="857.26" y="486.97" width="10.11" height="77.27" transform="translate(336.7 1387.92) rotate(-90)" fill="#4b3757" />
               <path
                 d="M835.36,520.55H823.68v10.11h77.26v-5H840.41A5.06,5.06,0,0,1,835.36,520.55Z"
                 fill="#7370bd"
                 opacity="0.2"
                 style={{ mixBlendMode: "multiply" }}
               />
-              <rect
-                x="857.26"
-                y="437.51"
-                width="10.11"
-                height="77.27"
-                transform="translate(386.17 1338.45) rotate(-90)"
-                fill="#4b3757"
-              />
+              <rect x="857.26" y="437.51" width="10.11" height="77.27" transform="translate(386.17 1338.45) rotate(-90)" fill="#4b3757" />
               <path
                 d="M835.36,471.09H823.68v10.1h77.26v-5.05H840.41A5,5,0,0,1,835.36,471.09Z"
                 fill="#7370bd"
@@ -2747,69 +2044,13 @@ class App extends Component {
               />
               <rect x="256.04" y="375.29" width="256" height="150.32" fill="#ffe8cf" />
               <g clipPath="url(#clipPath-14)">
-                <rect
-                  x="265.3"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="301.09"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="336.88"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="372.67"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="408.46"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="444.25"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="480.04"
-                  y="364.74"
-                  width="16"
-                  height="180.54"
-                  fill="#b55243"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
+                <rect x="265.3" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="301.09" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="336.88" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="372.67" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="408.46" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="444.25" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="480.04" y="364.74" width="16" height="180.54" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 <rect x="310.64" y="413.54" width="144" height="34.18" fill="#b55243" />
                 <g clipPath="url(#clipPath-15)">
                   <g opacity="0.2">
@@ -2989,12 +2230,7 @@ class App extends Component {
                 </g>
                 <rect x="272.57" y="487.08" width="42.42" height="2.49" fill="#b55243" />
                 <g clipPath="url(#clipPath-21)">
-                  <path
-                    d="M279.25,485.18s6.58,4.11,37.79,4.11v1.58H270.7v-3.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M279.25,485.18s6.58,4.11,37.79,4.11v1.58H270.7v-3.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <rect x="452.79" y="488.32" width="40.21" height="10.76" fill="#b55243" />
                 <g clipPath="url(#clipPath-22)">
@@ -3115,38 +2351,10 @@ class App extends Component {
                 <rect x="463.41" y="461.18" width="18.74" height="24.84" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-33)">
                   <g opacity="0.5" style={{ mixBlendMode: "overlay" }}>
-                    <rect
-                      x="464.89"
-                      y="451.29"
-                      width="4.21"
-                      height="27.79"
-                      transform="translate(465.71 -193.96) rotate(45)"
-                      fill="#fff"
-                    />
-                    <rect
-                      x="470.81"
-                      y="455.91"
-                      width="1.6"
-                      height="27.79"
-                      transform="translate(470.33 -195.88) rotate(45)"
-                      fill="#fff"
-                    />
-                    <rect
-                      x="478.71"
-                      y="467.99"
-                      width="1.6"
-                      height="27.79"
-                      transform="translate(481.19 -197.92) rotate(45)"
-                      fill="#fff"
-                    />
-                    <rect
-                      x="474.49"
-                      y="465.96"
-                      width="3.29"
-                      height="27.79"
-                      transform="translate(478.76 -196.13) rotate(45)"
-                      fill="#fff"
-                    />
+                    <rect x="464.89" y="451.29" width="4.21" height="27.79" transform="translate(465.71 -193.96) rotate(45)" fill="#fff" />
+                    <rect x="470.81" y="455.91" width="1.6" height="27.79" transform="translate(470.33 -195.88) rotate(45)" fill="#fff" />
+                    <rect x="478.71" y="467.99" width="1.6" height="27.79" transform="translate(481.19 -197.92) rotate(45)" fill="#fff" />
+                    <rect x="474.49" y="465.96" width="3.29" height="27.79" transform="translate(478.76 -196.13) rotate(45)" fill="#fff" />
                   </g>
                 </g>
                 <path d="M483.15,487H462.41V460.18h20.74Zm-18.74-2h16.74V462.18H464.41Z" fill="#4b3757" />
@@ -3481,12 +2689,7 @@ class App extends Component {
                 <path d="M701.73,432.76h-8.42V405.39h8.42Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-45)">
                   <rect x="691.54" y="408.97" width="11.96" height="3.17" fill="#ffea97" />
-                  <path
-                    d="M696.39,403.61s-3.08,27.89,6,27.89v2.95h-9.79V404.13Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M696.39,403.61s-3.08,27.89,6,27.89v2.95h-9.79V404.13Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M802.67,432.76H782.79a4,4,0,0,1-4-4h0a4,4,0,0,1,4-4h19.88Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-46)">
@@ -3497,10 +2700,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M802.67,426.48H783.73a2.28,2.28,0,0,0-2.28,2.27h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M802.67,426.48H783.73a2.28,2.28,0,0,0-2.28,2.27h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-47)">
                   <path
                     d="M785.77,425.22s-3.18,1.26-2.59,3.53,21.93,1.3,21.93,1.3v1.89h-25v-6Z"
@@ -3518,10 +2718,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M802.67,418.46H783.73a2.28,2.28,0,0,0-2.28,2.28h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M802.67,418.46H783.73a2.28,2.28,0,0,0-2.28,2.28h0a2.28,2.28,0,0,0,2.28,2.28h18.94Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-49)">
                   <path
                     d="M785.77,417.2s-3.18,1.26-2.59,3.54S805.11,422,805.11,422v1.89h-25v-6Z"
@@ -3533,33 +2730,16 @@ class App extends Component {
                 <path d="M771.71,432.76h-8.42V405.39h8.42Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-50)">
                   <rect x="761.52" y="408.97" width="11.96" height="3.17" fill="#ffea97" />
-                  <path
-                    d="M766.37,403.61s-3.08,27.89,6,27.89v2.95h-9.79V404.13Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M766.37,403.61s-3.08,27.89,6,27.89v2.95h-9.79V404.13Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M780,432.76H771.6V412.14H780Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-51)">
                   <rect x="769.84" y="414.83" width="11.96" height="2.39" fill="#ffea97" />
-                  <path
-                    d="M774.68,410.79s-3.08,21,6,21V434h-9.79V411.19Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M774.68,410.79s-3.08,21,6,21V434h-9.79V411.19Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M746.64,431.44l-8.2,1.92-6.25-26.64,8.19-1.92Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-52)">
-                  <rect
-                    x="731.49"
-                    y="409.19"
-                    width="11.96"
-                    height="3.17"
-                    transform="translate(-74.33 179.3) rotate(-13.2)"
-                    fill="#ffea97"
-                  />
+                  <rect x="731.49" y="409.19" width="11.96" height="3.17" transform="translate(-74.33 179.3) rotate(-13.2)" fill="#ffea97" />
                   <path
                     d="M734.78,404.27s3.37,27.86,12.18,25.8l.67,2.87-9.52,2.23-6.93-29.51Z"
                     fill="#b55243"
@@ -3567,10 +2747,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M733.73,432.76H707.1a5.36,5.36,0,0,1-5.37-5.37h0A5.36,5.36,0,0,1,707.1,422h26.63Z"
-                  fill="#4b3757"
-                />
+                <path d="M733.73,432.76H707.1a5.36,5.36,0,0,1-5.37-5.37h0A5.36,5.36,0,0,1,707.1,422h26.63Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-53)">
                   <path
                     d="M724.25,420.76s-16.58-.79-19.58,3.58c-1.3,1.91-2,7.32,3.69,7.32H735.1V434H701v-13.9Z"
@@ -3588,10 +2765,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M733.73,422H707.1a5.37,5.37,0,0,1-5.37-5.37h0a5.36,5.36,0,0,1,5.37-5.37h26.63Z"
-                  fill="#d3d2ff"
-                />
+                <path d="M733.73,422H707.1a5.37,5.37,0,0,1-5.37-5.37h0a5.36,5.36,0,0,1,5.37-5.37h26.63Z" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-55)">
                   <path
                     d="M724.25,410s-16.58-.79-19.58,3.58c-1.3,1.9-2,7.31,3.69,7.31H735.1v2.37H701v-13.9Z"
@@ -3622,10 +2796,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M753.69,434V411.39a2.72,2.72,0,0,0-2.72-2.72h0a2.72,2.72,0,0,0-2.73,2.72V434Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M753.69,434V411.39a2.72,2.72,0,0,0-2.72-2.72h0a2.72,2.72,0,0,0-2.73,2.72V434Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-58)">
                   <path
                     d="M755.19,413.84s-1.5-3.81-4.22-3.1-1.55,26.2-1.55,26.2h-2.26V407.07h7.15Z"
@@ -3634,10 +2805,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M755.75,434V415.39a3.76,3.76,0,0,1,3.76-3.75h0a3.75,3.75,0,0,1,3.76,3.75V434Z"
-                  fill="#7370bd"
-                />
+                <path d="M755.75,434V415.39a3.76,3.76,0,0,1,3.76-3.75h0a3.75,3.75,0,0,1,3.76,3.75V434Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-59)">
                   <path
                     d="M764.15,427.4s.55-11.6-2.5-13.7c-1.33-.92-5.12-1.4-5.12,2.58V435h-1.66V411.12h9.72Z"
@@ -3646,10 +2814,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M761.65,434V416.28a2.14,2.14,0,0,0-2.14-2.14h0a2.13,2.13,0,0,0-2.13,2.14V434Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M761.65,434V416.28a2.14,2.14,0,0,0-2.14-2.14h0a2.13,2.13,0,0,0-2.13,2.14V434Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-60)">
                   <path
                     d="M762.83,418.19s-1.18-3-3.32-2.43-1.21,20.55-1.21,20.55h-1.77V412.89h5.6Z"
@@ -3660,12 +2825,7 @@ class App extends Component {
                 </g>
                 <rect x="689.62" y="432.76" width="122.53" height="3.16" fill="#b55243" />
                 <g clipPath="url(#clipPath-61)">
-                  <path
-                    d="M730.57,431.92s27.26,4.21,88,3.47v2h-129l-3-4.73,2-1Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M730.57,431.92s27.26,4.21,88,3.47v2h-129l-3-4.73,2-1Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path
                   d="M669.93,532.24s8.72-87.1,71.15-125.18c38.75-23.64,87.65-20.1,87.65-20.1v-18.3H668.31Z"
@@ -3720,52 +2880,14 @@ class App extends Component {
                   <rect x="309.05" y="647.61" width="17.59" height="17.59" fill="#fff" />
                   <rect x="344.24" y="647.61" width="17.59" height="17.59" fill="#fff" />
                 </g>
-                <path
-                  d="M363.31,620H320.36V565.76a21.47,21.47,0,0,1,21.47-21.47h0a21.48,21.48,0,0,1,21.48,21.47Z"
-                  fill="#d3d2ff"
-                />
+                <path d="M363.31,620H320.36V565.76a21.47,21.47,0,0,1,21.47-21.47h0a21.48,21.48,0,0,1,21.48,21.47Z" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-63)">
-                  <rect
-                    x="324.68"
-                    y="516.47"
-                    width="8.42"
-                    height="95.05"
-                    transform="translate(495.13 -67.37) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
-                  <rect
-                    x="352.73"
-                    y="565.15"
-                    width="8.42"
-                    height="95.05"
-                    transform="translate(537.77 -72.95) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
-                  <rect
-                    x="334.44"
-                    y="524.29"
-                    width="5.92"
-                    height="95.05"
-                    transform="translate(503.15 -71.1) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
-                  <rect
-                    x="343.57"
-                    y="547.97"
-                    width="2.96"
-                    height="95.05"
-                    transform="translate(522.14 -69.57) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
+                  <rect x="324.68" y="516.47" width="8.42" height="95.05" transform="translate(495.13 -67.37) rotate(45)" fill="#fff" opacity="0.5" />
+                  <rect x="352.73" y="565.15" width="8.42" height="95.05" transform="translate(537.77 -72.95) rotate(45)" fill="#fff" opacity="0.5" />
+                  <rect x="334.44" y="524.29" width="5.92" height="95.05" transform="translate(503.15 -71.1) rotate(45)" fill="#fff" opacity="0.5" />
+                  <rect x="343.57" y="547.97" width="2.96" height="95.05" transform="translate(522.14 -69.57) rotate(45)" fill="#fff" opacity="0.5" />
                 </g>
-                <path
-                  d="M364.31,621H319.36V565.76a22.48,22.48,0,0,1,44.95,0Zm-42.95-2h40.95V565.76a20.48,20.48,0,0,0-40.95,0Z"
-                  fill="#4b3757"
-                />
+                <path d="M364.31,621H319.36V565.76a22.48,22.48,0,0,1,44.95,0Zm-42.95-2h40.95V565.76a20.48,20.48,0,0,0-40.95,0Z" fill="#4b3757" />
                 <path
                   d="M351.75,609.36h-2.7a1,1,0,0,1-1-.77l-.43-1.91a1,1,0,0,1,1-1.19h3.56a1,1,0,0,1,.95,1.19l-.42,1.91A1,1,0,0,1,351.75,609.36Z"
                   fill="#7370bd"
@@ -3836,12 +2958,7 @@ class App extends Component {
                   fill="#fff"
                 />
                 <g clipPath="url(#clipPath-70)">
-                  <path
-                    d="M269.2,605.5s-1.76,6.37,23.75,4.74v2H264.46v-6Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M269.2,605.5s-1.76,6.37,23.75,4.74v2H264.46v-6Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path
                   d="M268.43,630.24V611.5h15.33v23.39h15a.87.87,0,0,1,.64,1.47l-1.8,1.94a11.89,11.89,0,0,1-8.74,3.83h-8.53A11.89,11.89,0,0,1,268.43,630.24Z"
@@ -3855,22 +2972,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M283.76,634.89h16.58a1.82,1.82,0,0,0,1.81-1.82h0a1.81,1.81,0,0,0-1.81-1.81H283.76Z"
-                  fill="#fff"
-                />
+                <path d="M283.76,634.89h16.58a1.82,1.82,0,0,0,1.81-1.82h0a1.81,1.81,0,0,0-1.81-1.81H283.76Z" fill="#fff" />
                 <g clipPath="url(#clipPath-72)">
-                  <path
-                    d="M286.93,630s.69,5.26,16.69,3.89v1H281.73v-3.63Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M286.93,630s.69,5.26,16.69,3.89v1H281.73v-3.63Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <polygon
-                  points="284.03 615.28 281.31 615.28 281.31 614.29 284.03 614.01 284.03 615.28"
-                  fill="#4b3757"
-                />
+                <polygon points="284.03 615.28 281.31 615.28 281.31 614.29 284.03 614.01 284.03 615.28" fill="#4b3757" />
                 <rect x="275.04" y="566.42" width="18.71" height="27.16" fill="#fff" />
                 <g clipPath="url(#clipPath-73)">
                   <path
@@ -3916,14 +3022,7 @@ class App extends Component {
               <rect x="378.15" y="525.61" width="216.8" height="132" fill="#ead16c" />
               <g clipPath="url(#clipPath-75)">
                 <rect x="360.83" y="644.55" width="242.41" height="28.63" fill="#b55243" />
-                <rect
-                  x="390.04"
-                  y="652.16"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-257.11 1051.08) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="390.04" y="652.16" width="13.88" height="3.88" transform="translate(-257.11 1051.08) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-76)">
                   <path
                     d="M393.62,649.44s5.91-2,3.36,11.6,5.28,0,5.28,0L401,645.65l-8.51-.57Z"
@@ -3932,30 +3031,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="382.04"
-                  y="643.01"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(797.84 1290.16) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="382.04" y="643.01" width="33.76" height="4.15" transform="translate(797.84 1290.16) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-77)">
-                  <path
-                    d="M408.94,640.21s1.79,7.75-30.31,6.94v3.11h39.6v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M408.94,640.21s1.79,7.75-30.31,6.94v3.11h39.6v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="406.92"
-                  y="638.27"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-226.35 1054.07) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="406.92" y="638.27" width="13.88" height="3.88" transform="translate(-226.35 1054.07) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-78)">
                   <path
                     d="M410.5,635.56s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.27-15.38-8.51-.57Z"
@@ -3964,14 +3044,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="406.99"
-                  y="638.16"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-226.17 1054.03) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="406.99" y="638.16" width="13.88" height="3.88" transform="translate(-226.17 1054.03) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-79)">
                   <path
                     d="M410.57,635.45s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.27-15.38-8.51-.57Z"
@@ -3980,30 +3053,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="398.99"
-                  y="629.02"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(831.74 1262.18) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="398.99" y="629.02" width="33.76" height="4.15" transform="translate(831.74 1262.18) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-80)">
-                  <path
-                    d="M425.89,626.22s1.79,7.74-30.31,6.94v3.1h39.6v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M425.89,626.22s1.79,7.74-30.31,6.94v3.1h39.6v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="423.87"
-                  y="624.28"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-195.41 1057.03) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="423.87" y="624.28" width="13.88" height="3.88" transform="translate(-195.41 1057.03) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-81)">
                   <path
                     d="M427.45,621.57s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.27-15.38-8.51-.57Z"
@@ -4012,14 +3066,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="423.94"
-                  y="624.17"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-195.23 1056.99) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="423.94" y="624.17" width="13.88" height="3.88" transform="translate(-195.23 1056.99) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-82)">
                   <path
                     d="M427.52,621.46s5.9-2,3.36,11.59,5.27,0,5.27,0l-1.26-15.38-8.51-.57Z"
@@ -4028,30 +3075,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="415.94"
-                  y="615.03"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(865.63 1234.2) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="415.94" y="615.03" width="33.76" height="4.15" transform="translate(865.63 1234.2) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-83)">
-                  <path
-                    d="M442.84,612.23s1.79,7.74-30.31,6.94v3.1h39.6v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M442.84,612.23s1.79,7.74-30.31,6.94v3.1h39.6v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="440.82"
-                  y="610.29"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-164.47 1059.99) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="440.82" y="610.29" width="13.88" height="3.88" transform="translate(-164.47 1059.99) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-84)">
                   <path
                     d="M444.4,607.58s5.9-2,3.36,11.59,5.27,0,5.27,0l-1.26-15.38-8.51-.57Z"
@@ -4060,14 +3088,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="440.89"
-                  y="610.18"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-164.29 1059.95) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="440.89" y="610.18" width="13.88" height="3.88" transform="translate(-164.29 1059.95) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-85)">
                   <path
                     d="M444.47,607.47s5.9-2,3.36,11.59,5.27,0,5.27,0l-1.26-15.38-8.51-.57Z"
@@ -4076,30 +3097,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="432.89"
-                  y="601.03"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(899.53 1206.21) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="432.89" y="601.03" width="33.76" height="4.15" transform="translate(899.53 1206.21) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-86)">
-                  <path
-                    d="M459.78,598.24s1.8,7.74-30.31,6.94v3.1h39.6V599.5Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M459.78,598.24s1.8,7.74-30.31,6.94v3.1h39.6V599.5Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="457.76"
-                  y="596.3"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-133.53 1062.94) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="457.76" y="596.3" width="13.88" height="3.88" transform="translate(-133.53 1062.94) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-87)">
                   <path
                     d="M461.34,593.59s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.26-15.38-8.52-.57Z"
@@ -4108,14 +3110,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="457.83"
-                  y="596.19"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-133.35 1062.9) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="457.83" y="596.19" width="13.88" height="3.88" transform="translate(-133.35 1062.9) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-88)">
                   <path
                     d="M461.41,593.48s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.26-15.38-8.52-.57Z"
@@ -4124,30 +3119,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="449.84"
-                  y="587.04"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(933.43 1178.23) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="449.84" y="587.04" width="33.76" height="4.15" transform="translate(933.43 1178.23) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-89)">
-                  <path
-                    d="M476.73,584.25s1.79,7.74-30.31,6.94v3.1H486v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M476.73,584.25s1.79,7.74-30.31,6.94v3.1H486v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="474.71"
-                  y="582.31"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-102.59 1065.9) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="474.71" y="582.31" width="13.88" height="3.88" transform="translate(-102.59 1065.9) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-90)">
                   <path
                     d="M478.29,579.6s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.27-15.38-8.51-.58Z"
@@ -4156,14 +3132,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="474.78"
-                  y="582.2"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-102.42 1065.86) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="474.78" y="582.2" width="13.88" height="3.88" transform="translate(-102.42 1065.86) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-91)">
                   <path
                     d="M478.36,579.49s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.27-15.38-8.51-.58Z"
@@ -4172,30 +3141,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="466.78"
-                  y="573.05"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(967.32 1150.25) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="466.78" y="573.05" width="33.76" height="4.15" transform="translate(967.32 1150.25) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-92)">
-                  <path
-                    d="M493.68,570.26s1.79,7.74-30.31,6.94v3.1H503v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M493.68,570.26s1.79,7.74-30.31,6.94v3.1H503v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="491.66"
-                  y="568.32"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-71.66 1068.86) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="491.66" y="568.32" width="13.88" height="3.88" transform="translate(-71.66 1068.86) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-93)">
                   <path
                     d="M495.24,565.6s5.91-2,3.36,11.6,5.28,0,5.28,0l-1.27-15.38-8.51-.58Z"
@@ -4204,14 +3154,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="491.73"
-                  y="568.21"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-71.48 1068.82) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="491.73" y="568.21" width="13.88" height="3.88" transform="translate(-71.48 1068.82) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-94)">
                   <path
                     d="M495.31,565.49s5.91-2,3.36,11.6,5.28,0,5.28,0l-1.27-15.38-8.51-.58Z"
@@ -4220,30 +3163,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="483.73"
-                  y="559.06"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(1001.22 1122.27) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="483.73" y="559.06" width="33.76" height="4.15" transform="translate(1001.22 1122.27) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-95)">
-                  <path
-                    d="M510.63,556.26s1.79,7.75-30.31,7v3.1h39.6v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M510.63,556.26s1.79,7.75-30.31,7v3.1h39.6v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="508.61"
-                  y="554.33"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-40.72 1071.81) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="508.61" y="554.33" width="13.88" height="3.88" transform="translate(-40.72 1071.81) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-96)">
                   <path
                     d="M512.19,551.61s5.9-2,3.36,11.6,5.27,0,5.27,0l-1.26-15.39-8.51-.57Z"
@@ -4252,14 +3176,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="508.68"
-                  y="554.22"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-40.54 1071.77) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="508.68" y="554.22" width="13.88" height="3.88" transform="translate(-40.54 1071.77) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-97)">
                   <path
                     d="M512.26,551.5s5.9-2,3.36,11.6,5.27,0,5.27,0l-1.26-15.39-8.51-.57Z"
@@ -4268,30 +3185,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="500.68"
-                  y="545.07"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(1035.11 1094.28) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="500.68" y="545.07" width="33.76" height="4.15" transform="translate(1035.11 1094.28) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-98)">
-                  <path
-                    d="M527.58,542.27s1.79,7.75-30.31,6.94v3.11h39.59v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M527.58,542.27s1.79,7.75-30.31,6.94v3.11h39.59v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="525.56"
-                  y="540.34"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-9.78 1074.77) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="525.56" y="540.34" width="13.88" height="3.88" transform="translate(-9.78 1074.77) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-99)">
                   <path
                     d="M529.14,537.62s5.9-2,3.36,11.59,5.27,0,5.27,0l-1.26-15.38-8.51-.57Z"
@@ -4300,14 +3198,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="525.63"
-                  y="540.23"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-9.6 1074.73) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="525.63" y="540.23" width="13.88" height="3.88" transform="translate(-9.6 1074.73) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-100)">
                   <path
                     d="M529.21,537.51s5.9-2,3.36,11.59,5.27,0,5.27,0l-1.26-15.38-8.52-.57Z"
@@ -4316,30 +3207,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="517.63"
-                  y="531.08"
-                  width="33.76"
-                  height="4.15"
-                  transform="translate(1069.01 1066.3) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="517.63" y="531.08" width="33.76" height="4.15" transform="translate(1069.01 1066.3) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-101)">
-                  <path
-                    d="M544.52,528.28s1.8,7.75-30.31,6.94v3.11h39.6v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M544.52,528.28s1.8,7.75-30.31,6.94v3.11h39.6v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="542.5"
-                  y="526.34"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(21.16 1077.73) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="542.5" y="526.34" width="13.88" height="3.88" transform="translate(21.16 1077.73) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-102)">
                   <path
                     d="M546.08,523.63s5.91-2,3.36,11.59,5.28,0,5.28,0l-1.26-15.38-8.52-.57Z"
@@ -4356,24 +3228,8 @@ class App extends Component {
                 />
                 <circle cx="557.34" cy="583.43" r="29.24" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-103)">
-                  <rect
-                    x="532.15"
-                    y="536.98"
-                    width="6.77"
-                    height="76.43"
-                    transform="translate(563.6 -210.21) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
-                  <rect
-                    x="578.64"
-                    y="552.23"
-                    width="6.77"
-                    height="76.43"
-                    transform="translate(588 -238.62) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
+                  <rect x="532.15" y="536.98" width="6.77" height="76.43" transform="translate(563.6 -210.21) rotate(45)" fill="#fff" opacity="0.5" />
+                  <rect x="578.64" y="552.23" width="6.77" height="76.43" transform="translate(588 -238.62) rotate(45)" fill="#fff" opacity="0.5" />
                   <rect
                     x="540.01"
                     y="543.27"
@@ -4392,68 +3248,21 @@ class App extends Component {
                     fill="#fff"
                     opacity="0.5"
                   />
-                  <rect
-                    x="591.5"
-                    y="555"
-                    width="2.38"
-                    height="76.43"
-                    transform="translate(593.06 -245.34) rotate(45)"
-                    fill="#fff"
-                    opacity="0.5"
-                  />
+                  <rect x="591.5" y="555" width="2.38" height="76.43" transform="translate(593.06 -245.34) rotate(45)" fill="#fff" opacity="0.5" />
                 </g>
                 <path
                   d="M557.34,613.67a30.24,30.24,0,1,1,30.24-30.24A30.27,30.27,0,0,1,557.34,613.67Zm0-58.48a28.24,28.24,0,1,0,28.24,28.24A28.27,28.27,0,0,0,557.34,555.19Z"
                   fill="#4b3757"
                 />
-                <path
-                  d="M520.16,629.57h-35c-6,27.2,17.53,25.26,17.53,25.26S526.14,656.77,520.16,629.57Z"
-                  fill="#d3d2ff"
-                />
+                <path d="M520.16,629.57h-35c-6,27.2,17.53,25.26,17.53,25.26S526.14,656.77,520.16,629.57Z" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-104)">
                   <g opacity="0.3">
-                    <path
-                      d="M470.23,640.28s13.21-3.34,36.26-23.13"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M475.19,644.21s13.21-3.34,36.26-23.13"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M480.16,648.15s13.2-3.34,36.26-23.13"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M485.12,652.09s13.2-3.34,36.26-23.14"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M490.08,656s13.2-3.34,36.26-23.13"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M495,660s13.21-3.34,36.26-23.13"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M470.23,640.28s13.21-3.34,36.26-23.13" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M475.19,644.21s13.21-3.34,36.26-23.13" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M480.16,648.15s13.2-3.34,36.26-23.13" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M485.12,652.09s13.2-3.34,36.26-23.14" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M490.08,656s13.2-3.34,36.26-23.13" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M495,660s13.21-3.34,36.26-23.13" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
                   </g>
                   <path
                     d="M499.81,630.73s-5.53,3.59-3.15,14.62,24.44,4.77,23.6,2.82-.86,13.17-23.6,9.65-12.52-29.59-12.52-29.59l15.67,2.5"
@@ -4518,15 +3327,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="349.1"
-                  y="673.82"
-                  width="17.75"
-                  height="23.08"
-                  rx="2.69"
-                  transform="translate(-327.38 1043.34) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="349.1" y="673.82" width="17.75" height="23.08" rx="2.69" transform="translate(-327.38 1043.34) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-109)">
                   <path
                     d="M345.25,684a13.59,13.59,0,0,0,9.87,4.73c6.11,0,11.24-.59,11.24-15h5.72v24.07H345.65Z"
@@ -4535,10 +3336,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M312.31,680.27v-9.81H287.57v9.81h-3.42V694.4L315.06,696V680.27Zm-22.74-7.81h20.74v7.81H289.57Z"
-                  fill="#ffea97"
-                />
+                <path d="M312.31,680.27v-9.81H287.57v9.81h-3.42V694.4L315.06,696V680.27Zm-22.74-7.81h20.74v7.81H289.57Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-110)">
                   <path
                     d="M302.94,667.06s-9.16,7.28-9.16,17.55,30.32,7.1,30.32,7.1v6.45h-42v-31.1Z"
@@ -4547,10 +3345,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M389.89,683.63v-7.71H370.43v7.71h-2.69v11.12L392.06,696V683.63ZM372,677.49h16.32v6.14H372Z"
-                  fill="#7370bd"
-                />
+                <path d="M389.89,683.63v-7.71H370.43v7.71h-2.69v11.12L392.06,696V683.63ZM372,677.49h16.32v6.14H372Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-111)">
                   <path
                     d="M382.52,673.25s-7.2,5.72-7.2,13.8,23.84,5.59,23.84,5.59v5.07h-33V673.25Z"
@@ -4597,12 +3392,7 @@ class App extends Component {
                   fill="#4b3757"
                 />
                 <g clipPath="url(#clipPath-115)">
-                  <path
-                    d="M297.34,776.58s-5-.49-5,4.61v8.1h-5.64V766.86h11.75Z"
-                    fill="#7370bd"
-                    opacity="0.3"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M297.34,776.58s-5-.49-5,4.61v8.1h-5.64V766.86h11.75Z" fill="#7370bd" opacity="0.3" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path
                   d="M384.23,786.55h0a3.47,3.47,0,0,1-3.48-3.47V772.27a3.48,3.48,0,0,1,3.48-3.47h0a3.47,3.47,0,0,1,3.47,3.47v10.81A3.47,3.47,0,0,1,384.23,786.55Z"
@@ -4629,42 +3419,10 @@ class App extends Component {
                   />
                   <rect x="309.1" y="752.24" width="58.95" height="12.84" rx="1.58" fill="#4b3757" />
                   <g clipPath="url(#clipPath-118)">
-                    <rect
-                      x="306.87"
-                      y="753.8"
-                      width="64.04"
-                      height="1.3"
-                      fill="#7370bd"
-                      opacity="0.3"
-                      style={{ mixBlendMode: "multiply" }}
-                    />
-                    <rect
-                      x="306.87"
-                      y="756.6"
-                      width="64.04"
-                      height="1.3"
-                      fill="#7370bd"
-                      opacity="0.3"
-                      style={{ mixBlendMode: "multiply" }}
-                    />
-                    <rect
-                      x="306.87"
-                      y="759.41"
-                      width="64.04"
-                      height="1.3"
-                      fill="#7370bd"
-                      opacity="0.3"
-                      style={{ mixBlendMode: "multiply" }}
-                    />
-                    <rect
-                      x="306.87"
-                      y="762.22"
-                      width="64.04"
-                      height="1.3"
-                      fill="#7370bd"
-                      opacity="0.3"
-                      style={{ mixBlendMode: "multiply" }}
-                    />
+                    <rect x="306.87" y="753.8" width="64.04" height="1.3" fill="#7370bd" opacity="0.3" style={{ mixBlendMode: "multiply" }} />
+                    <rect x="306.87" y="756.6" width="64.04" height="1.3" fill="#7370bd" opacity="0.3" style={{ mixBlendMode: "multiply" }} />
+                    <rect x="306.87" y="759.41" width="64.04" height="1.3" fill="#7370bd" opacity="0.3" style={{ mixBlendMode: "multiply" }} />
+                    <rect x="306.87" y="762.22" width="64.04" height="1.3" fill="#7370bd" opacity="0.3" style={{ mixBlendMode: "multiply" }} />
                     <path
                       d="M319.67,751.17s-6.36,3.37-4.57,7.07c2.84,5.89,54.42,2.94,54.42,2.94v5.37H307.41v-15Z"
                       fill="#7370bd"
@@ -4744,14 +3502,7 @@ class App extends Component {
               </g>
               <rect x="256.04" y="789.92" width="338.53" height="126" fill="#895da8" />
               <g clipPath="url(#clipPath-122)">
-                <rect
-                  x="282.85"
-                  y="917.04"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-629.19 1208.77) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="282.85" y="917.04" width="13.88" height="3.89" transform="translate(-629.19 1208.77) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-123)">
                   <path
                     d="M286.42,914.33s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.53-.57Z"
@@ -4760,30 +3511,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="274.81"
-                  y="907.89"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(583.47 1819.93) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="274.81" y="907.89" width="33.85" height="4.15" transform="translate(583.47 1819.93) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-124)">
-                  <path
-                    d="M301.78,905.1s1.8,7.74-30.39,6.94v3.1H311.1v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M301.78,905.1s1.8,7.74-30.39,6.94v3.1H311.1v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="299.78"
-                  y="903.15"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-598.38 1211.81) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="299.78" y="903.15" width="13.88" height="3.89" transform="translate(-598.38 1211.81) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-125)">
                   <path
                     d="M303.35,900.45s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.58Z"
@@ -4792,14 +3524,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="299.85"
-                  y="903.04"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-598.2 1211.77) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="299.85" y="903.04" width="13.88" height="3.89" transform="translate(-598.2 1211.77) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-126)">
                   <path
                     d="M303.42,900.34s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.58Z"
@@ -4808,30 +3533,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="291.8"
-                  y="893.9"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(617.46 1791.95) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="291.8" y="893.9" width="33.85" height="4.15" transform="translate(617.46 1791.95) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-127)">
-                  <path
-                    d="M318.78,891.11s1.79,7.74-30.4,6.94v3.1h39.71v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M318.78,891.11s1.79,7.74-30.4,6.94v3.1h39.71v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="316.77"
-                  y="889.16"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-567.39 1214.82) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="316.77" y="889.16" width="13.88" height="3.89" transform="translate(-567.39 1214.82) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-128)">
                   <path
                     d="M320.34,886.45s5.92-2,3.37,11.6,5.29,0,5.29,0l-1.27-15.38-8.53-.58Z"
@@ -4840,14 +3546,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="316.84"
-                  y="889.05"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-567.22 1214.78) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="316.84" y="889.05" width="13.88" height="3.89" transform="translate(-567.22 1214.78) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-129)">
                   <path
                     d="M320.41,886.35s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.53-.58Z"
@@ -4856,30 +3555,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="308.8"
-                  y="879.91"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(651.45 1763.97) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="308.8" y="879.91" width="33.85" height="4.15" transform="translate(651.45 1763.97) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-130)">
-                  <path
-                    d="M335.77,877.12s1.8,7.74-30.39,6.94v3.1h39.71v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M335.77,877.12s1.8,7.74-30.39,6.94v3.1h39.71v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="333.77"
-                  y="875.17"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-536.41 1217.82) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="333.77" y="875.17" width="13.88" height="3.89" transform="translate(-536.41 1217.82) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-131)">
                   <path
                     d="M337.34,872.46s5.92-2,3.37,11.6,5.29,0,5.29,0l-1.27-15.39-8.54-.57Z"
@@ -4888,14 +3568,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="333.84"
-                  y="875.06"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-536.23 1217.78) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="333.84" y="875.06" width="13.88" height="3.89" transform="translate(-536.23 1217.78) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-132)">
                   <path
                     d="M337.41,872.35s5.92-2,3.37,11.6,5.29,0,5.29,0l-1.27-15.38-8.54-.58Z"
@@ -4904,30 +3577,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="325.8"
-                  y="865.92"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(685.44 1735.98) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="325.8" y="865.92" width="33.85" height="4.15" transform="translate(685.44 1735.98) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-133)">
-                  <path
-                    d="M352.77,863.12s1.8,7.75-30.4,6.94v3.11h39.71v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M352.77,863.12s1.8,7.75-30.4,6.94v3.11h39.71v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="350.76"
-                  y="861.18"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-505.42 1220.83) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="350.76" y="861.18" width="13.88" height="3.89" transform="translate(-505.42 1220.83) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-134)">
                   <path
                     d="M354.33,858.47s5.93-2,3.37,11.59,5.29,0,5.29,0l-1.26-15.38-8.54-.57Z"
@@ -4936,14 +3590,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="350.83"
-                  y="861.07"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-505.24 1220.79) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="350.83" y="861.07" width="13.88" height="3.89" transform="translate(-505.24 1220.79) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-135)">
                   <path
                     d="M354.4,858.36s5.93-2,3.37,11.6,5.29,0,5.29,0l-1.26-15.39-8.54-.57Z"
@@ -4952,30 +3599,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="342.79"
-                  y="851.93"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(719.43 1708) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="342.79" y="851.93" width="33.85" height="4.15" transform="translate(719.43 1708) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-136)">
-                  <path
-                    d="M369.76,849.13s1.8,7.75-30.39,6.94v3.11h39.71v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M369.76,849.13s1.8,7.75-30.39,6.94v3.11h39.71v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="367.76"
-                  y="847.19"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-474.43 1223.83) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="367.76" y="847.19" width="13.88" height="3.89" transform="translate(-474.43 1223.83) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-137)">
                   <path
                     d="M371.33,844.48s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.57Z"
@@ -4984,14 +3612,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="367.83"
-                  y="847.08"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-474.25 1223.79) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="367.83" y="847.08" width="13.88" height="3.89" transform="translate(-474.25 1223.79) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-138)">
                   <path
                     d="M371.4,844.37s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.57Z"
@@ -5000,30 +3621,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="359.79"
-                  y="837.94"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(753.43 1680.02) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="359.79" y="837.94" width="33.85" height="4.15" transform="translate(753.43 1680.02) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-139)">
-                  <path
-                    d="M386.76,835.14s1.8,7.74-30.4,6.94v3.1h39.72V836.4Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M386.76,835.14s1.8,7.74-30.4,6.94v3.1h39.72V836.4Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="384.75"
-                  y="833.2"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-443.45 1226.84) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="384.75" y="833.2" width="13.88" height="3.89" transform="translate(-443.45 1226.84) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-140)">
                   <path
                     d="M388.32,830.49s5.93-2,3.37,11.59,5.3,0,5.3,0l-1.27-15.38-8.54-.57Z"
@@ -5032,14 +3634,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="384.82"
-                  y="833.09"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-443.27 1226.8) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="384.82" y="833.09" width="13.88" height="3.89" transform="translate(-443.27 1226.8) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-141)">
                   <path
                     d="M388.39,830.38s5.93-2,3.37,11.59,5.3,0,5.3,0l-1.27-15.38-8.54-.57Z"
@@ -5048,30 +3643,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="376.78"
-                  y="823.94"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(787.42 1652.04) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="376.78" y="823.94" width="33.85" height="4.15" transform="translate(787.42 1652.04) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-142)">
-                  <path
-                    d="M403.76,821.15s1.79,7.74-30.4,6.94v3.1h39.71v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M403.76,821.15s1.79,7.74-30.4,6.94v3.1h39.71v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="401.75"
-                  y="819.21"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-412.46 1229.84) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="401.75" y="819.21" width="13.88" height="3.89" transform="translate(-412.46 1229.84) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-143)">
                   <path
                     d="M405.32,816.5s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.53-.57Z"
@@ -5080,14 +3656,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="401.82"
-                  y="819.1"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-412.28 1229.8) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="401.82" y="819.1" width="13.88" height="3.89" transform="translate(-412.28 1229.8) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-144)">
                   <path
                     d="M405.39,816.39s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.53-.57Z"
@@ -5096,30 +3665,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="393.78"
-                  y="809.95"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(821.41 1624.05) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="393.78" y="809.95" width="33.85" height="4.15" transform="translate(821.41 1624.05) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-145)">
-                  <path
-                    d="M420.75,807.16s1.8,7.74-30.39,6.94v3.1h39.71v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M420.75,807.16s1.8,7.74-30.39,6.94v3.1h39.71v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="418.75"
-                  y="805.21"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-381.47 1232.85) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="418.75" y="805.21" width="13.88" height="3.89" transform="translate(-381.47 1232.85) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-146)">
                   <path
                     d="M422.32,802.51s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.58Z"
@@ -5128,14 +3678,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="418.82"
-                  y="805.11"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-381.29 1232.81) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="418.82" y="805.11" width="13.88" height="3.89" transform="translate(-381.29 1232.81) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-147)">
                   <path
                     d="M422.39,802.4s5.92-2,3.37,11.59,5.29,0,5.29,0l-1.27-15.38-8.54-.57Z"
@@ -5144,30 +3687,11 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="410.77"
-                  y="795.96"
-                  width="33.85"
-                  height="4.15"
-                  transform="translate(855.4 1596.07) rotate(180)"
-                  fill="#ffe8cf"
-                />
+                <rect x="410.77" y="795.96" width="33.85" height="4.15" transform="translate(855.4 1596.07) rotate(180)" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-148)">
-                  <path
-                    d="M437.75,793.17s1.8,7.74-30.4,6.94v3.1h39.71v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M437.75,793.17s1.8,7.74-30.4,6.94v3.1h39.71v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="435.74"
-                  y="791.22"
-                  width="13.88"
-                  height="3.89"
-                  transform="translate(-350.49 1235.85) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="435.74" y="791.22" width="13.88" height="3.89" transform="translate(-350.49 1235.85) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-149)">
                   <path
                     d="M439.31,788.52s5.93-2,3.37,11.59,5.29,0,5.29,0l-1.26-15.38-8.54-.58Z"
@@ -5268,13 +3792,7 @@ class App extends Component {
                 <rect x="531.18" y="846.85" width="52.71" height="66.12" fill="#fff" />
                 <g clipPath="url(#clipPath-157)">
                   <rect x="529.84" y="845.23" width="55.72" height="4.16" fill="#4b3757" />
-                  <circle
-                    cx="557.54"
-                    cy="879.91"
-                    r="20.35"
-                    transform="translate(-458.89 651.96) rotate(-45)"
-                    fill="#4b3757"
-                  />
+                  <circle cx="557.54" cy="879.91" r="20.35" transform="translate(-458.89 651.96) rotate(-45)" fill="#4b3757" />
                   <circle cx="557.54" cy="879.91" r="17.17" fill="#d3d2ff" />
                   <g clipPath="url(#clipPath-158)">
                     <path
@@ -5321,16 +3839,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="417.56"
-                  y="857.82"
-                  width="9.16"
-                  height="10.36"
-                  rx="0.88"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
+                <rect x="417.56" y="857.82" width="9.16" height="10.36" rx="0.88" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 <g clipPath="url(#clipPath-161)">
                   <path
                     d="M422.86,857.28a6,6,0,0,0-2.44,4.43c0,2.74.3,5,7.73,5v2.56H415.73V857.46Z"
@@ -5348,15 +3857,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="429.44"
-                  y="857.28"
-                  width="9.47"
-                  height="12.32"
-                  rx="0.88"
-                  transform="translate(-429.26 1297.62) rotate(-90)"
-                  fill="#ff8d7b"
-                />
+                <rect x="429.44" y="857.28" width="9.47" height="12.32" rx="0.88" transform="translate(-429.26 1297.62) rotate(-90)" fill="#ff8d7b" />
                 <g clipPath="url(#clipPath-163)">
                   <path
                     d="M427.39,862.7a7.24,7.24,0,0,0,5.26,2.53c3.27,0,6-.32,6-8h3.06v12.84H427.6Z"
@@ -5365,15 +3866,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="399.04"
-                  y="892.08"
-                  width="9.47"
-                  height="12.32"
-                  rx="0.88"
-                  transform="translate(-494.46 1302.02) rotate(-90)"
-                  fill="#fff"
-                />
+                <rect x="399.04" y="892.08" width="9.47" height="12.32" rx="0.88" transform="translate(-494.46 1302.02) rotate(-90)" fill="#fff" />
                 <g clipPath="url(#clipPath-164)">
                   <path
                     d="M397,897.5a7.24,7.24,0,0,0,5.26,2.53c3.27,0,6-.32,6-8h3.06v12.84H397.2Z"
@@ -5418,14 +3911,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="353.21"
-                  y="881.52"
-                  width="60.05"
-                  height="1.54"
-                  transform="translate(1265.53 499.06) rotate(90)"
-                  fill="#4b3757"
-                />
+                <rect x="353.21" y="881.52" width="60.05" height="1.54" transform="translate(1265.53 499.06) rotate(90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-169)">
                   <path
                     d="M384.42,872.34s-2.06,13.36-1.7,43.16h-1V852.27l2.32-1.5.48,1Z"
@@ -5434,14 +3920,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="412.19"
-                  y="881.52"
-                  width="60.05"
-                  height="1.54"
-                  transform="translate(1324.52 440.08) rotate(90)"
-                  fill="#4b3757"
-                />
+                <rect x="412.19" y="881.52" width="60.05" height="1.54" transform="translate(1324.52 440.08) rotate(90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-170)">
                   <path
                     d="M443.4,872.34s-2.06,13.36-1.7,43.16h-1V852.27l2.31-1.5.49,1Z"
@@ -5529,14 +4008,7 @@ class App extends Component {
                     />
                   </g>
                 </g>
-                <rect
-                  x="568.01"
-                  y="787.57"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-214.55 1364.46) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="568.01" y="787.57" width="13.88" height="3.88" transform="translate(-214.55 1364.46) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-174)">
                   <path
                     d="M578.32,784.85s-5.91-2-3.36,11.6-5.28,0-5.28,0l1.26-15.38,8.52-.58Z"
@@ -5547,21 +4019,9 @@ class App extends Component {
                 </g>
                 <rect x="556.14" y="778.42" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-175)">
-                  <path
-                    d="M563,775.62s-1.79,7.75,30.31,7v3.1h-39.6v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M563,775.62s-1.79,7.75,30.31,7v3.1h-39.6v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="551.14"
-                  y="773.69"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-217.55 1333.7) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="551.14" y="773.69" width="13.88" height="3.88" transform="translate(-217.55 1333.7) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-176)">
                   <path
                     d="M561.44,771s-5.91-2-3.36,11.6-5.28,0-5.28,0l1.27-15.39,8.51-.57Z"
@@ -5570,14 +4030,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="551.07"
-                  y="773.58"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-217.51 1333.52) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="551.07" y="773.58" width="13.88" height="3.88" transform="translate(-217.51 1333.52) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-177)">
                   <path
                     d="M561.37,770.86s-5.91-2-3.36,11.6-5.28,0-5.28,0L554,767.07l8.51-.57Z"
@@ -5595,14 +4048,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="534.19"
-                  y="759.69"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-220.5 1302.76) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="534.19" y="759.69" width="13.88" height="3.88" transform="translate(-220.5 1302.76) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-179)">
                   <path
                     d="M544.49,757s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.27-15.38,8.51-.57Z"
@@ -5611,14 +4057,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="534.12"
-                  y="759.58"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-220.46 1302.58) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="534.12" y="759.58" width="13.88" height="3.88" transform="translate(-220.46 1302.58) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-180)">
                   <path
                     d="M544.42,756.87s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.27-15.38,8.51-.57Z"
@@ -5629,21 +4068,9 @@ class App extends Component {
                 </g>
                 <rect x="522.24" y="750.44" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-181)">
-                  <path
-                    d="M529.1,747.64s-1.79,7.75,30.31,6.94v3.11h-39.6V748.9Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M529.1,747.64s-1.79,7.75,30.31,6.94v3.11h-39.6V748.9Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="517.24"
-                  y="745.7"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-223.46 1271.82) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="517.24" y="745.7" width="13.88" height="3.88" transform="translate(-223.46 1271.82) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-182)">
                   <path
                     d="M527.54,743s-5.9-2-3.36,11.59-5.27,0-5.27,0l1.26-15.38,8.51-.57Z"
@@ -5652,14 +4079,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="517.17"
-                  y="745.59"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-223.42 1271.64) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="517.17" y="745.59" width="13.88" height="3.88" transform="translate(-223.42 1271.64) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-183)">
                   <path
                     d="M527.47,742.88s-5.9-2-3.36,11.59-5.27,0-5.27,0l1.26-15.38,8.51-.57Z"
@@ -5677,14 +4097,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="500.29"
-                  y="731.71"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-226.42 1240.88) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="500.29" y="731.71" width="13.88" height="3.88" transform="translate(-226.42 1240.88) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-185)">
                   <path
                     d="M510.59,729s-5.9-2-3.36,11.59-5.27,0-5.27,0l1.26-15.38,8.52-.57Z"
@@ -5693,14 +4106,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="500.22"
-                  y="731.6"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-226.38 1240.7) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="500.22" y="731.6" width="13.88" height="3.88" transform="translate(-226.38 1240.7) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-186)">
                   <path
                     d="M510.52,728.89s-5.9-2-3.36,11.59-5.27,0-5.27,0l1.26-15.38,8.52-.57Z"
@@ -5711,21 +4117,9 @@ class App extends Component {
                 </g>
                 <rect x="488.35" y="722.45" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-187)">
-                  <path
-                    d="M495.21,719.66s-1.8,7.74,30.31,6.94v3.1h-39.6v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M495.21,719.66s-1.8,7.74,30.31,6.94v3.1h-39.6v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="483.34"
-                  y="717.72"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-229.37 1209.94) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="483.34" y="717.72" width="13.88" height="3.88" transform="translate(-229.37 1209.94) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-188)">
                   <path
                     d="M493.65,715s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.26-15.38,8.52-.57Z"
@@ -5734,14 +4128,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="483.27"
-                  y="717.61"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-229.33 1209.77) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="483.27" y="717.61" width="13.88" height="3.88" transform="translate(-229.33 1209.77) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-189)">
                   <path
                     d="M493.58,714.9s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.26-15.38,8.52-.57Z"
@@ -5752,21 +4139,9 @@ class App extends Component {
                 </g>
                 <rect x="471.4" y="708.46" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-190)">
-                  <path
-                    d="M478.26,705.67s-1.79,7.74,30.31,6.94v3.1H469v-8.78Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M478.26,705.67s-1.79,7.74,30.31,6.94v3.1H469v-8.78Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="466.4"
-                  y="703.73"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-232.33 1179.01) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="466.4" y="703.73" width="13.88" height="3.88" transform="translate(-232.33 1179.01) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-191)">
                   <path
                     d="M476.7,701s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.27-15.38,8.51-.58Z"
@@ -5775,14 +4150,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="466.33"
-                  y="703.62"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-232.29 1178.83) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="466.33" y="703.62" width="13.88" height="3.88" transform="translate(-232.29 1178.83) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-192)">
                   <path
                     d="M476.63,700.91s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.27-15.38,8.51-.58Z"
@@ -5793,21 +4161,9 @@ class App extends Component {
                 </g>
                 <rect x="454.45" y="694.47" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-193)">
-                  <path
-                    d="M461.31,691.68s-1.79,7.74,30.31,6.94v3.1H452v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M461.31,691.68s-1.79,7.74,30.31,6.94v3.1H452v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="449.45"
-                  y="689.74"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-235.29 1148.07) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="449.45" y="689.74" width="13.88" height="3.88" transform="translate(-235.29 1148.07) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-194)">
                   <path
                     d="M459.75,687s-5.91-2-3.36,11.6-5.28,0-5.28,0l1.27-15.38,8.51-.58Z"
@@ -5816,14 +4172,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="449.38"
-                  y="689.63"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-235.25 1147.89) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="449.38" y="689.63" width="13.88" height="3.88" transform="translate(-235.25 1147.89) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-195)">
                   <path
                     d="M459.68,686.92s-5.91-2-3.36,11.59-5.28,0-5.28,0l1.27-15.38,8.51-.58Z"
@@ -5834,21 +4183,9 @@ class App extends Component {
                 </g>
                 <rect x="437.5" y="680.48" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-196)">
-                  <path
-                    d="M444.36,677.69s-1.79,7.74,30.31,6.94v3.1h-39.6v-8.79Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M444.36,677.69s-1.79,7.74,30.31,6.94v3.1h-39.6v-8.79Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="432.5"
-                  y="675.75"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-238.24 1117.13) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="432.5" y="675.75" width="13.88" height="3.88" transform="translate(-238.24 1117.13) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-197)">
                   <path
                     d="M442.8,673s-5.9-2-3.36,11.6-5.27,0-5.27,0l1.26-15.39,8.51-.57Z"
@@ -5857,14 +4194,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="432.43"
-                  y="675.64"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-238.2 1116.95) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="432.43" y="675.64" width="13.88" height="3.88" transform="translate(-238.2 1116.95) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-198)">
                   <path
                     d="M442.73,672.92s-5.9-2-3.36,11.6-5.27,0-5.27,0l1.26-15.38,8.51-.58Z"
@@ -5875,21 +4205,9 @@ class App extends Component {
                 </g>
                 <rect x="420.56" y="666.49" width="33.76" height="4.15" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-199)">
-                  <path
-                    d="M427.41,663.69s-1.79,7.75,30.32,6.95v3.1h-39.6V665Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M427.41,663.69s-1.79,7.75,30.32,6.95v3.1h-39.6V665Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <rect
-                  x="415.55"
-                  y="661.76"
-                  width="13.88"
-                  height="3.88"
-                  transform="translate(-241.2 1086.19) rotate(-90)"
-                  fill="#4b3757"
-                />
+                <rect x="415.55" y="661.76" width="13.88" height="3.88" transform="translate(-241.2 1086.19) rotate(-90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-200)">
                   <path
                     d="M425.85,659s-5.9-2-3.36,11.6-5.27,0-5.27,0l1.26-15.39,8.52-.57Z"
@@ -6052,12 +4370,7 @@ class App extends Component {
                 <rect x="654.61" y="729.7" width="156.7" height="55.48" fill="#fff" />
                 <rect x="654.61" y="729.7" width="156.7" height="3.36" fill="#4b3757" />
                 <g clipPath="url(#clipPath-212)">
-                  <path
-                    d="M682.38,726.61s-30.65,5.57,133.56,5.57v2h-164v-7.6Z"
-                    fill="#7370bd"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M682.38,726.61s-30.65,5.57,133.56,5.57v2h-164v-7.6Z" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <rect x="654.61" y="735.99" width="27.77" height="49.2" fill="#fff" />
                 <g clipPath="url(#clipPath-213)">
@@ -6254,10 +4567,7 @@ class App extends Component {
                   </g>
                 </g>
                 <path d="M1004.05,727.38H839.31V686.56h164.74Zm-162.49-2.26h160.23V688.81H841.56Z" fill="#4b3757" />
-                <path
-                  d="M854.3,791.76l10.9-33.49h12l-21.38,34.1C855.32,793.17,854,792.64,854.3,791.76Z"
-                  fill="#ff654d"
-                />
+                <path d="M854.3,791.76l10.9-33.49h12l-21.38,34.1C855.32,793.17,854,792.64,854.3,791.76Z" fill="#ff654d" />
                 <g clipPath="url(#clipPath-222)">
                   <path
                     d="M875,766.7s-7.89-.55-12,5.22-8.73,22.35-8.73,22.35l-8,1.42,16.61-35.77L879,761.2Z"
@@ -6266,10 +4576,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M985.68,791.76l-10.9-33.49h-12l21.38,34.1C984.66,793.17,986,792.64,985.68,791.76Z"
-                  fill="#ff654d"
-                />
+                <path d="M985.68,791.76l-10.9-33.49h-12l21.38,34.1C984.66,793.17,986,792.64,985.68,791.76Z" fill="#ff654d" />
                 <g clipPath="url(#clipPath-223)">
                   <path
                     d="M978.57,764.72s-6.75.41-4.32,5.94,11.47,22.6,11.47,22.6l-4.31,1-24.32-32,22.43-4Z"
@@ -6299,54 +4606,15 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M1042,767.63h-33.08c-5.65,25.68,16.54,23.85,16.54,23.85S1047.63,793.31,1042,767.63Z"
-                  fill="#ff8d7b"
-                />
+                <path d="M1042,767.63h-33.08c-5.65,25.68,16.54,23.85,16.54,23.85S1047.63,793.31,1042,767.63Z" fill="#ff8d7b" />
                 <g clipPath="url(#clipPath-226)">
                   <g opacity="0.3">
-                    <path
-                      d="M994.86,777.74s12.46-3.15,34.23-21.84"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M999.54,781.45s12.47-3.15,34.23-21.83"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M1004.22,785.17s12.47-3.15,34.24-21.84"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M1008.91,788.89s12.47-3.16,34.23-21.84"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M1013.59,792.6s12.47-3.15,34.23-21.84"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M1018.28,796.32s12.46-3.16,34.23-21.84"
-                      fill="none"
-                      stroke="#4b3757"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M994.86,777.74s12.46-3.15,34.23-21.84" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M999.54,781.45s12.47-3.15,34.23-21.83" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M1004.22,785.17s12.47-3.15,34.24-21.84" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M1008.91,788.89s12.47-3.16,34.23-21.84" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M1013.59,792.6s12.47-3.15,34.23-21.84" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M1018.28,796.32s12.46-3.16,34.23-21.84" fill="none" stroke="#4b3757" strokeLinecap="round" strokeLinejoin="round" />
                   </g>
                   <path
                     d="M1022.77,768.73s-5.22,3.39-3,13.79,23.08,4.51,22.29,2.66-.82,12.44-22.29,9.12S1008,766.37,1008,766.37l14.78,2.36"
@@ -6530,17 +4798,9 @@ class App extends Component {
                 <path d="M744.8,614.78h-5.55v-18h5.55Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-237)">
                   <rect x="738.09" y="599.09" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M741.28,595.55s-2,18.39,3.94,18.39v1.95h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M741.28,595.55s-2,18.39,3.94,18.39v1.95h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <path
-                  d="M792.82,614.78H779.7a2.65,2.65,0,0,1-2.64-2.65h0a2.64,2.64,0,0,1,2.64-2.64h13.12Z"
-                  fill="#4b3757"
-                />
+                <path d="M792.82,614.78H779.7a2.65,2.65,0,0,1-2.64-2.65h0a2.64,2.64,0,0,1,2.64-2.64h13.12Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-238)">
                   <path
                     d="M788.15,608.87s-8.16-.39-9.64,1.76c-.64.94-1,3.6,1.82,3.6h13.16v1.17H776.7v-6.84Z"
@@ -6549,10 +4809,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M792.82,610.63H780.33a1.51,1.51,0,0,0-1.51,1.5h0a1.52,1.52,0,0,0,1.51,1.51h12.49Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M792.82,610.63H780.33a1.51,1.51,0,0,0-1.51,1.5h0a1.52,1.52,0,0,0,1.51,1.51h12.49Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-239)">
                   <path
                     d="M781.67,609.8s-2.1.83-1.71,2.33,14.46.86,14.46.86v1.24H777.94v-3.94Z"
@@ -6561,10 +4818,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M792.82,609.49H779.7a2.64,2.64,0,0,1-2.64-2.64h0a2.65,2.65,0,0,1,2.64-2.65h13.12Z"
-                  fill="#ffea97"
-                />
+                <path d="M792.82,609.49H779.7a2.64,2.64,0,0,1-2.64-2.64h0a2.65,2.65,0,0,1,2.64-2.65h13.12Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-240)">
                   <path
                     d="M788.15,603.58s-8.16-.39-9.64,1.76c-.64.94-1,3.61,1.82,3.61h13.16v1.16H776.7v-6.84Z"
@@ -6573,10 +4827,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M792.82,605.34H780.33a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M792.82,605.34H780.33a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-241)">
                   <path
                     d="M781.67,604.51s-2.1.83-1.71,2.34,14.46.85,14.46.85V609H777.94v-4Z"
@@ -6588,33 +4839,16 @@ class App extends Component {
                 <path d="M798.29,614.78h-5.55v-18h5.55Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-242)">
                   <rect x="791.57" y="599.09" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M794.77,595.55s-2,18.39,3.94,18.39v1.95h-6.46v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M794.77,595.55s-2,18.39,3.94,18.39v1.95h-6.46v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M809,614.78h-5.55v-18H809Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-243)">
                   <rect x="802.31" y="599.09" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M805.51,595.55s-2,18.39,3.93,18.39v1.95H803v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M805.51,595.55s-2,18.39,3.93,18.39v1.95H803v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M815.29,614.59l-5.39.35-1.12-17.52,5.39-.34Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-244)">
-                  <rect
-                    x="807.85"
-                    y="599.53"
-                    width="7.67"
-                    height="2.03"
-                    transform="translate(-36.68 53.04) rotate(-3.66)"
-                    fill="#ffe8cf"
-                  />
+                  <rect x="807.85" y="599.53" width="7.67" height="2.03" transform="translate(-36.68 53.04) rotate(-3.66)" fill="#ffe8cf" />
                   <path
                     d="M810.68,596.15s-.83,18,5,17.61l.12,1.88-6.26.4-1.24-19.4Z"
                     fill="#b55243"
@@ -6625,17 +4859,9 @@ class App extends Component {
                 <path d="M803.78,614.78h-5.56V598.55h5.56Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-245)">
                   <rect x="797.06" y="600.67" width="7.88" height="1.88" fill="#ffe8cf" />
-                  <path
-                    d="M800.26,597.49s-2,16.54,3.93,16.54v1.74h-6.45v-18Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M800.26,597.49s-2,16.54,3.93,16.54v1.74h-6.45v-18Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <path
-                  d="M765.9,614.78H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z"
-                  fill="#4b3757"
-                />
+                <path d="M765.9,614.78H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-246)">
                   <path
                     d="M759.66,606.86s-10.93-.52-12.91,2.36c-.86,1.26-1.32,4.83,2.43,4.83h17.63v1.56H744.32v-9.16Z"
@@ -6653,10 +4879,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M765.9,607.7H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z"
-                  fill="#d3d2ff"
-                />
+                <path d="M765.9,607.7H748.34a3.55,3.55,0,0,1-3.54-3.54h0a3.54,3.54,0,0,1,3.54-3.54H765.9Z" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-248)">
                   <path
                     d="M759.66,599.78s-10.93-.52-12.91,2.36c-.86,1.26-1.32,4.83,2.43,4.83h17.63v1.56H744.32v-9.16Z"
@@ -6674,10 +4897,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M766,615.61V599.94a3.17,3.17,0,0,1,3.16-3.16h0a3.16,3.16,0,0,1,3.16,3.16v15.67Z"
-                  fill="#ffea97"
-                />
+                <path d="M766,615.61V599.94a3.17,3.17,0,0,1,3.16-3.16h0a3.16,3.16,0,0,1,3.16,3.16v15.67Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-250)">
                   <path
                     d="M773,610s.47-9.76-2.1-11.52c-1.12-.77-4.31-1.18-4.31,2.17v15.72h-1.39V596.35h8.17Z"
@@ -6686,10 +4906,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M770.94,615.61V600.69a1.8,1.8,0,0,0-1.8-1.8h0a1.79,1.79,0,0,0-1.79,1.8v14.92Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M770.94,615.61V600.69a1.8,1.8,0,0,0-1.8-1.8h0a1.79,1.79,0,0,0-1.79,1.8v14.92Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-251)">
                   <path
                     d="M771.93,602.3s-1-2.51-2.79-2-1,17.28-1,17.28h-1.49V597.84h4.72Z"
@@ -6698,10 +4915,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M772.3,615.61V603.32a2.48,2.48,0,0,1,2.48-2.48h0a2.48,2.48,0,0,1,2.47,2.48v12.29Z"
-                  fill="#7370bd"
-                />
+                <path d="M772.3,615.61V603.32a2.48,2.48,0,0,1,2.48-2.48h0a2.48,2.48,0,0,1,2.47,2.48v12.29Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-252)">
                   <path
                     d="M777.84,611.24s.36-7.65-1.65-9c-.88-.6-3.38-.92-3.38,1.7v12.34h-1.09V600.5h6.41Z"
@@ -6710,10 +4924,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M776.19,615.61V603.9a1.41,1.41,0,0,0-1.41-1.4h0a1.41,1.41,0,0,0-1.41,1.4v11.71Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M776.19,615.61V603.9a1.41,1.41,0,0,0-1.41-1.4h0a1.41,1.41,0,0,0-1.41,1.4v11.71Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-253)">
                   <path
                     d="M777,605.17s-.78-2-2.18-1.61-.8,13.55-.8,13.55h-1.17V601.67h3.7Z"
@@ -6734,12 +4945,7 @@ class App extends Component {
                 <path d="M744.8,591.41h-5.55v-18h5.55Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-255)">
                   <rect x="738.09" y="575.72" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M741.28,572.18s-2,18.39,3.94,18.39v1.95h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M741.28,572.18s-2,18.39,3.94,18.39v1.95h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path
                   d="M785.79,585.11h17.44a0,0,0,0,1,0,0v6.3a0,0,0,0,1,0,0H785.79a1.32,1.32,0,0,1-1.32-1.32v-3.65A1.32,1.32,0,0,1,785.79,585.11Z"
@@ -6753,10 +4959,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M803.24,586.47H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M803.24,586.47H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-257)">
                   <path
                     d="M790,585.48s-2.5,1-2,2.78,17.22,1,17.22,1v1.48H785.52v-4.7Z"
@@ -6777,10 +4980,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M803.24,580.17H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M803.24,580.17H788.36a1.79,1.79,0,0,0-1.79,1.79h0a1.79,1.79,0,0,0,1.79,1.79h14.88Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-259)">
                   <path
                     d="M790,579.19s-2.5,1-2,2.77,17.22,1,17.22,1v1.48H785.52v-4.69Z"
@@ -6792,33 +4992,16 @@ class App extends Component {
                 <path d="M761.34,591.41h-5.55v-18h5.55Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-260)">
                   <rect x="754.63" y="575.72" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M757.82,572.18s-2,18.39,3.94,18.39v1.95h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M757.82,572.18s-2,18.39,3.94,18.39v1.95h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M808.71,591.41h-5.55v-18h5.55Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-261)">
                   <rect x="802" y="575.72" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M805.19,572.18s-2,18.39,3.94,18.39v1.95h-6.46v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M805.19,572.18s-2,18.39,3.94,18.39v1.95h-6.46v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M816.19,590.89l-5.48.83L808,573.88l5.49-.83Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-262)">
-                  <rect
-                    x="807.31"
-                    y="575.78"
-                    width="7.88"
-                    height="2.09"
-                    transform="translate(-77.46 128.43) rotate(-8.64)"
-                    fill="#ffea97"
-                  />
+                  <rect x="807.31" y="575.78" width="7.88" height="2.09" transform="translate(-77.46 128.43) rotate(-8.64)" fill="#ffea97" />
                   <path
                     d="M809.82,572.41s.76,18.49,6.66,17.59l.29,1.92-6.38,1-3-19.76Z"
                     fill="#b55243"
@@ -6828,69 +5011,25 @@ class App extends Component {
                 </g>
                 <path d="M784.64,585.82v5.56h-18v-5.56Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-263)">
-                  <rect
-                    x="766.06"
-                    y="587.55"
-                    width="7.88"
-                    height="2.09"
-                    transform="translate(181.4 1358.6) rotate(-90)"
-                    fill="#ffea97"
-                  />
-                  <path
-                    d="M765.42,589.34s18.39,2,18.39-3.93h1.94v6.45h-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <rect x="766.06" y="587.55" width="7.88" height="2.09" transform="translate(181.4 1358.6) rotate(-90)" fill="#ffea97" />
+                  <path d="M765.42,589.34s18.39,2,18.39-3.93h1.94v6.45h-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M784.64,580.27v5.55h-18v-5.55Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-264)">
-                  <rect
-                    x="766.06"
-                    y="582"
-                    width="7.88"
-                    height="2.09"
-                    transform="translate(186.95 1353.05) rotate(-90)"
-                    fill="#ffea97"
-                  />
-                  <path
-                    d="M765.42,583.79s18.39,2,18.39-3.94h1.94v6.46h-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <rect x="766.06" y="582" width="7.88" height="2.09" transform="translate(186.95 1353.05) rotate(-90)" fill="#ffea97" />
+                  <path d="M765.42,583.79s18.39,2,18.39-3.94h1.94v6.46h-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M784.64,574.72v5.55h-18v-5.55Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-265)">
-                  <rect
-                    x="766.06"
-                    y="576.45"
-                    width="7.88"
-                    height="2.09"
-                    transform="translate(192.51 1347.49) rotate(-90)"
-                    fill="#ffea97"
-                  />
-                  <path
-                    d="M765.42,578.24s18.39,2,18.39-3.94h1.94v6.46h-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <rect x="766.06" y="576.45" width="7.88" height="2.09" transform="translate(192.51 1347.49) rotate(-90)" fill="#ffea97" />
+                  <path d="M765.42,578.24s18.39,2,18.39-3.94h1.94v6.46h-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M766.83,591.41h-5.55V575.18h5.55Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-266)">
                   <rect x="760.11" y="577.3" width="7.88" height="1.88" fill="#ffea97" />
-                  <path
-                    d="M763.31,574.12s-2,16.54,3.94,16.54v1.75h-6.46v-18Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M763.31,574.12s-2,16.54,3.94,16.54v1.75h-6.46v-18Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <path
-                  d="M744.51,592.24V576.57a3.15,3.15,0,0,1,3.16-3.15h0a3.16,3.16,0,0,1,3.16,3.15v15.67Z"
-                  fill="#ffea97"
-                />
+                <path d="M744.51,592.24V576.57a3.15,3.15,0,0,1,3.16-3.15h0a3.16,3.16,0,0,1,3.16,3.15v15.67Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-267)">
                   <path
                     d="M751.57,586.67s.46-9.76-2.11-11.52c-1.12-.77-4.3-1.18-4.3,2.17v15.73h-1.39V573h8.17Z"
@@ -6899,10 +5038,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M749.46,592.24V577.32a1.8,1.8,0,0,0-1.79-1.8h0a1.81,1.81,0,0,0-1.8,1.8v14.92Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M749.46,592.24V577.32a1.8,1.8,0,0,0-1.79-1.8h0a1.81,1.81,0,0,0-1.8,1.8v14.92Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-268)">
                   <path
                     d="M750.45,578.93s-1-2.51-2.78-2-1,17.28-1,17.28h-1.49V574.47h4.71Z"
@@ -6911,10 +5047,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M750.83,592.24V580a2.47,2.47,0,0,1,2.47-2.47h0a2.48,2.48,0,0,1,2.48,2.47v12.29Z"
-                  fill="#7370bd"
-                />
+                <path d="M750.83,592.24V580a2.47,2.47,0,0,1,2.47-2.47h0a2.48,2.48,0,0,1,2.48,2.47v12.29Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-269)">
                   <path
                     d="M756.36,587.87s.37-7.65-1.65-9c-.88-.61-3.37-.93-3.37,1.7v12.33h-1.1V577.14h6.41Z"
@@ -6923,10 +5056,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M754.71,592.24v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M754.71,592.24v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-270)">
                   <path
                     d="M755.49,581.8s-.78-2-2.19-1.6-.8,13.55-.8,13.55h-1.16V578.3H755Z"
@@ -6947,12 +5077,7 @@ class App extends Component {
                 <path d="M744.8,568h-5.55V550h5.55Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-272)">
                   <rect x="738.09" y="552.35" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M741.28,548.81s-2,18.4,3.94,18.4v1.94h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M741.28,548.81s-2,18.4,3.94,18.4v1.94h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M749.35,568h-4.57V553.17h4.57Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-273)">
@@ -6967,12 +5092,7 @@ class App extends Component {
                 <path d="M753.91,568h-4.58V553.17h4.58Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-274)">
                   <rect x="748.37" y="555.11" width="6.5" height="1.72" fill="#ffea97" />
-                  <path
-                    d="M751,552.19s-1.68,15.16,3.24,15.16V569h-5.32V552.48Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M751,552.19s-1.68,15.16,3.24,15.16V569h-5.32V552.48Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M758.46,568h-4.57V551.82h4.57Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-275)">
@@ -6986,14 +5106,7 @@ class App extends Component {
                 </g>
                 <path d="M766.69,567.22l-4.43,1.16L758.5,554l4.43-1.16Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-276)">
-                  <rect
-                    x="758.18"
-                    y="555.26"
-                    width="6.5"
-                    height="1.72"
-                    transform="matrix(0.97, -0.25, 0.25, 0.97, -115.92, 210.73)"
-                    fill="#ffea97"
-                  />
+                  <rect x="758.18" y="555.26" width="6.5" height="1.72" transform="matrix(0.97, -0.25, 0.25, 0.97, -115.92, 210.73)" fill="#ffea97" />
                   <path
                     d="M759.87,552.62s2.22,15.09,7,13.85l.4,1.55-5.14,1.34-4.17-15.94Z"
                     fill="#b55243"
@@ -7004,17 +5117,9 @@ class App extends Component {
                 <path d="M814.59,568H809V550h5.55Z" fill="#d3d2ff" />
                 <g clipPath="url(#clipPath-277)">
                   <rect x="807.88" y="552.35" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M811.07,548.81s-2,18.4,3.94,18.4v1.94h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M811.07,548.81s-2,18.4,3.94,18.4v1.94h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
-                <path
-                  d="M803.24,568H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.65h13.11Z"
-                  fill="#4b3757"
-                />
+                <path d="M803.24,568H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.65h13.11Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-278)">
                   <path
                     d="M798.57,562.13s-8.16-.39-9.64,1.76c-.64.94-1,3.61,1.82,3.61h13.16v1.16H787.12v-6.84Z"
@@ -7023,10 +5128,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M803.24,563.89H790.75a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M803.24,563.89H790.75a1.52,1.52,0,0,0-1.51,1.51h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-279)">
                   <path
                     d="M792.09,563.06s-2.09.83-1.71,2.34,14.46.85,14.46.85v1.25H788.36v-4Z"
@@ -7035,10 +5137,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M803.24,562.75H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.64h13.11Z"
-                  fill="#ffea97"
-                />
+                <path d="M803.24,562.75H790.13a2.65,2.65,0,0,1-2.65-2.64h0a2.65,2.65,0,0,1,2.65-2.64h13.11Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-280)">
                   <path
                     d="M798.57,556.84s-8.16-.38-9.64,1.77c-.64.93-1,3.6,1.82,3.6h13.16v1.16H787.12v-6.84Z"
@@ -7047,10 +5146,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M803.24,558.61H790.75a1.51,1.51,0,0,0-1.51,1.5h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M803.24,558.61H790.75a1.51,1.51,0,0,0-1.51,1.5h0a1.51,1.51,0,0,0,1.51,1.5h12.49Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-281)">
                   <path
                     d="M792.09,557.78s-2.09.83-1.71,2.33,14.46.85,14.46.85v1.25H788.36v-4Z"
@@ -7062,33 +5158,16 @@ class App extends Component {
                 <path d="M782.82,568h-5.55V550h5.55Z" fill="#4b3757" />
                 <g clipPath="url(#clipPath-282)">
                   <rect x="776.1" y="552.35" width="7.88" height="2.09" fill="#ffea97" />
-                  <path
-                    d="M779.3,548.81s-2,18.4,3.93,18.4v1.94h-6.45v-20Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M779.3,548.81s-2,18.4,3.93,18.4v1.94h-6.45v-20Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M788.3,568h-5.55V551.82h5.55Z" fill="#b55243" />
                 <g clipPath="url(#clipPath-283)">
                   <rect x="781.59" y="553.93" width="7.88" height="1.88" fill="#ffea97" />
-                  <path
-                    d="M784.78,550.75s-2,16.54,3.94,16.54V569h-6.45v-18Z"
-                    fill="#b55243"
-                    opacity="0.2"
-                    style={{ mixBlendMode: "multiply" }}
-                  />
+                  <path d="M784.78,550.75s-2,16.54,3.94,16.54V569h-6.45v-18Z" fill="#b55243" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
                 </g>
                 <path d="M809.89,567.49l-5.49.87-2.83-17.82,5.49-.87Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-284)">
-                  <rect
-                    x="800.91"
-                    y="552.42"
-                    width="7.88"
-                    height="2.09"
-                    transform="translate(-76.87 133.13) rotate(-9.03)"
-                    fill="#ffea97"
-                  />
+                  <rect x="800.91" y="552.42" width="7.88" height="2.09" transform="translate(-76.87 133.13) rotate(-9.03)" fill="#ffea97" />
                   <path
                     d="M803.39,549.06s.88,18.48,6.78,17.54l.3,1.92-6.37,1L801,549.79Z"
                     fill="#b55243"
@@ -7096,10 +5175,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M766,568.87V553.21a3.16,3.16,0,0,1,3.16-3.16h0a3.15,3.15,0,0,1,3.16,3.16v15.66Z"
-                  fill="#ffea97"
-                />
+                <path d="M766,568.87V553.21a3.16,3.16,0,0,1,3.16-3.16h0a3.15,3.15,0,0,1,3.16,3.16v15.66Z" fill="#ffea97" />
                 <g clipPath="url(#clipPath-285)">
                   <path
                     d="M773,563.3s.47-9.75-2.1-11.52c-1.12-.77-4.31-1.17-4.31,2.17v15.73h-1.39V549.61h8.17Z"
@@ -7117,10 +5193,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M772.3,568.87V556.58a2.48,2.48,0,0,1,2.48-2.47h0a2.48,2.48,0,0,1,2.47,2.47v12.29Z"
-                  fill="#7370bd"
-                />
+                <path d="M772.3,568.87V556.58a2.48,2.48,0,0,1,2.48-2.47h0a2.48,2.48,0,0,1,2.47,2.47v12.29Z" fill="#7370bd" />
                 <g clipPath="url(#clipPath-287)">
                   <path
                     d="M777.84,564.5s.36-7.65-1.65-9c-.88-.61-3.38-.92-3.38,1.7V569.5h-1.09V553.77h6.41Z"
@@ -7129,10 +5202,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <path
-                  d="M776.19,568.87v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z"
-                  fill="#ffe8cf"
-                />
+                <path d="M776.19,568.87v-11.7a1.41,1.41,0,0,0-1.41-1.41h0a1.41,1.41,0,0,0-1.41,1.41v11.7Z" fill="#ffe8cf" />
                 <g clipPath="url(#clipPath-288)">
                   <path
                     d="M777,558.43s-.78-2-2.18-1.6-.8,13.55-.8,13.55h-1.17V554.93h3.7Z"
@@ -7159,14 +5229,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="696.5"
-                  y="586.05"
-                  width="81.02"
-                  height="2.08"
-                  transform="translate(1324.1 -149.91) rotate(90)"
-                  fill="#4b3757"
-                />
+                <rect x="696.5" y="586.05" width="81.02" height="2.08" transform="translate(1324.1 -149.91) rotate(90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-291)">
                   <path
                     d="M738.6,573.66s-2.77,18-2.29,58.22H735V546.59l3.13-2,.66,1.32Z"
@@ -7175,14 +5238,7 @@ class App extends Component {
                     style={{ mixBlendMode: "multiply" }}
                   />
                 </g>
-                <rect
-                  x="776.08"
-                  y="586.05"
-                  width="81.02"
-                  height="2.08"
-                  transform="translate(1403.68 -229.49) rotate(90)"
-                  fill="#4b3757"
-                />
+                <rect x="776.08" y="586.05" width="81.02" height="2.08" transform="translate(1403.68 -229.49) rotate(90)" fill="#4b3757" />
                 <g clipPath="url(#clipPath-292)">
                   <path
                     d="M818.18,573.66s-2.77,18-2.29,58.22h-1.32V546.59l3.13-2,.66,1.32Z"
@@ -7252,28 +5308,13 @@ class App extends Component {
                 fill="#4b3757"
               />
               <g opacity="0.2" style={{ mixBlendMode: "multiply" }}>
-                <polygon
-                  points="416.04 784.55 416.04 660.12 261.1 660.12 261.1 662.66 410.99 662.66 410.99 784.55 416.04 784.55"
-                  fill="#7370bd"
-                />
-                <polygon
-                  points="594.95 910.87 594.95 792.12 261.1 792.12 261.1 794.66 589.89 794.66 589.89 910.87 594.95 910.87"
-                  fill="#7370bd"
-                />
-                <polygon
-                  points="594.95 660.12 421.1 660.12 421.1 662.66 589.89 662.66 589.89 784.55 594.95 784.55 594.95 660.12"
-                  fill="#7370bd"
-                />
-                <polygon
-                  points="373.1 652.55 378.15 652.55 378.15 528.12 261.1 528.12 261.1 530.66 373.1 530.66 373.1 652.55"
-                  fill="#7370bd"
-                />
+                <polygon points="416.04 784.55 416.04 660.12 261.1 660.12 261.1 662.66 410.99 662.66 410.99 784.55 416.04 784.55" fill="#7370bd" />
+                <polygon points="594.95 910.87 594.95 792.12 261.1 792.12 261.1 794.66 589.89 794.66 589.89 910.87 594.95 910.87" fill="#7370bd" />
+                <polygon points="594.95 660.12 421.1 660.12 421.1 662.66 589.89 662.66 589.89 784.55 594.95 784.55 594.95 660.12" fill="#7370bd" />
+                <polygon points="373.1 652.55 378.15 652.55 378.15 528.12 261.1 528.12 261.1 530.66 373.1 530.66 373.1 652.55" fill="#7370bd" />
                 <rect x="1047.35" y="650.66" width="5.05" height="133.89" fill="#7370bd" />
                 <rect x="818.62" y="380.34" width="5.05" height="140.21" fill="#7370bd" />
-                <polygon
-                  points="823.68 528.12 600 528.12 600 530.66 818.62 530.66 818.62 652.55 823.68 652.55 823.68 528.12"
-                  fill="#7370bd"
-                />
+                <polygon points="823.68 528.12 600 528.12 600 530.66 818.62 530.66 818.62 652.55 823.68 652.55 823.68 528.12" fill="#7370bd" />
                 <polygon
                   points="594.95 918.43 266.15 918.43 261.1 918.43 256.04 918.43 256.04 792.12 256.04 782.01 256.04 660.12 256.04 650.01 256.04 528.12 256.04 518.01 256.04 380.34 250.99 380.34 250.99 520.55 250.99 530.66 250.99 652.55 250.99 662.66 250.99 784.55 250.99 794.66 250.99 920.97 256.04 920.97 261.1 920.97 589.89 920.97 600 920.97 600 918.43 594.95 918.43"
                   fill="#7370bd"
@@ -7283,15 +5324,9 @@ class App extends Component {
                   points="1052.4 792.12 833.78 792.12 823.68 792.12 600 792.12 600 794.66 818.62 794.66 828.73 794.66 1047.35 794.66 1057.46 794.66 1057.46 792.12 1052.4 792.12"
                   fill="#7370bd"
                 />
-                <polygon
-                  points="823.68 784.55 823.68 660.12 600 660.12 600 662.66 818.62 662.66 818.62 784.55 823.68 784.55"
-                  fill="#7370bd"
-                />
+                <polygon points="823.68 784.55 823.68 660.12 600 660.12 600 662.66 818.62 662.66 818.62 784.55 823.68 784.55" fill="#7370bd" />
                 <rect x="669.94" y="375.29" width="5.05" height="145.26" fill="#7370bd" />
-                <polygon
-                  points="594.95 528.12 383.2 528.12 383.2 530.66 589.89 530.66 589.89 652.55 594.95 652.55 594.95 528.12"
-                  fill="#7370bd"
-                />
+                <polygon points="594.95 528.12 383.2 528.12 383.2 530.66 589.89 530.66 589.89 652.55 594.95 652.55 594.95 528.12" fill="#7370bd" />
               </g>
               <rect
                 x="948.16"
@@ -7302,10 +5337,7 @@ class App extends Component {
                 fill="#0f001f"
                 style={{ mixBlendMode: "multiply" }}
               />
-              <polygon
-                points="1057.81 543.29 828.73 543.29 828.73 652.55 1077.7 652.55 1057.81 543.29"
-                fill="#7370bd"
-              />
+              <polygon points="1057.81 543.29 828.73 543.29 828.73 652.55 1077.7 652.55 1057.81 543.29" fill="#7370bd" />
               <g clipPath="url(#clipPath-297)">
                 <path
                   d="M900.94,525.61s-36.06,17.68-23.42,72.31S1116.72,648,1116.72,648v22.06H813.1v-137Z"
@@ -7319,96 +5351,16 @@ class App extends Component {
                   opacity="0.1"
                   style={{ mixBlendMode: "overlay" }}
                 />
-                <rect
-                  x="577.12"
-                  y="550.25"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="560.62"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="570.98"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="581.35"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="591.71"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="602.07"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="612.44"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="622.8"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="633.16"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="577.12"
-                  y="643.53"
-                  width="544.99"
-                  height="2.89"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
+                <rect x="577.12" y="550.25" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="560.62" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="570.98" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="581.35" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="591.71" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="602.07" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="612.44" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="622.8" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="633.16" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="577.12" y="643.53" width="544.99" height="2.89" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
               </g>
               <rect
                 x="534.81"
@@ -7433,110 +5385,45 @@ class App extends Component {
                   opacity="0.14"
                   style={{ mixBlendMode: "overlay" }}
                 />
-                <rect
-                  x="154.82"
-                  y="202.24"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="219.03"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="235.82"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="252.61"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="269.4"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="286.19"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="302.98"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="319.77"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="336.56"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
-                <rect
-                  x="154.82"
-                  y="353.35"
-                  width="774.48"
-                  height="4.68"
-                  fill="#7370bd"
-                  opacity="0.2"
-                  style={{ mixBlendMode: "multiply" }}
-                />
+                <rect x="154.82" y="202.24" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="219.03" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="235.82" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="252.61" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="269.4" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="286.19" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="302.98" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="319.77" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="336.56" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
+                <rect x="154.82" y="353.35" width="774.48" height="4.68" fill="#7370bd" opacity="0.2" style={{ mixBlendMode: "multiply" }} />
               </g>
             </g>
           </g>
         </svg>
 
         <form id="connection-information-form">
-          <input type="button" onClick={() => this.startConnect()} value="Connect" />
-          <input type="button" onClick={() => this.startDisconnect()} value="Disconnect" />
+          <input
+            type="button"
+            onClick={() => this.startConnect()}
+            value="Connect"
+            disabled={this.state.connected}
+            className={this.state.connected ? "connected" : "disconnected"}
+          />
+          <input
+            type="button"
+            onClick={() => this.startDisconnect()}
+            value="Disconnect"
+            disabled={!this.state.connected}
+            id="disconnect-button"
+            className={this.state.connected ? "connected" : "disconnected"}
+          />
         </form>
-        <div id="messages">
-          {this.state.messages.map((m, i) => (
-            <p key={i}>{m}</p>
-          ))}
-        </div>
+        {this.state.qr[this.state.selected_qr].displayDebug && (
+          <div id="messages">
+            {this.state.messages.map((m, i) => (
+              <p key={i}>{m}</p>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
